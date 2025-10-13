@@ -9,7 +9,7 @@ const Products = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Products
+export default Products;

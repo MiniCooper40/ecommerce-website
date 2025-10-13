@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
@@ -8,7 +8,7 @@ const Header = () => {
           <Link to="/" className="text-xl font-bold text-gray-900">
             EcommerceApp
           </Link>
-          
+
           <nav className="hidden md:flex space-x-8">
             <Link to="/" className="text-gray-600 hover:text-gray-900">
               Home
@@ -20,7 +20,7 @@ const Header = () => {
               Cart
             </Link>
           </nav>
-          
+
           <div className="flex items-center space-x-4">
             <Link to="/login" className="btn btn-primary">
               Login
@@ -29,7 +29,7 @@ const Header = () => {
         </div>
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

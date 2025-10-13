@@ -6,7 +6,7 @@ const Cart = () => {
         Cart functionality will be implemented
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Cart
+export default Cart;

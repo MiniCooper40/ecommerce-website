@@ -1,10 +1,15 @@
 const Login = () => {
   return (
     <div className="max-w-md mx-auto">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">Login</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+        Login
+      </h1>
       <form className="space-y-6">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
             Email
           </label>
           <input
@@ -14,9 +19,12 @@ const Login = () => {
             placeholder="Enter your email"
           />
         </div>
-        
+
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
             Password
           </label>
           <input
@@ -26,13 +34,13 @@ const Login = () => {
             placeholder="Enter your password"
           />
         </div>
-        
+
         <button type="submit" className="w-full btn btn-primary">
           Sign In
         </button>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

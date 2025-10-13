@@ -8,13 +8,13 @@ const Home = () => {
         <p className="text-xl text-gray-600 mb-8">
           Discover amazing products at unbeatable prices
         </p>
-        <button className="btn btn-primary text-lg px-8 py-3">
-          Shop Now
-        </button>
+        <button className="btn btn-primary text-lg px-8 py-3">Shop Now</button>
       </section>
-      
+
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 mb-8">Featured Products</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-8">
+          Featured Products
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {/* Product cards will be rendered here */}
           <div className="bg-white rounded-lg shadow-md p-4">
@@ -25,7 +25,7 @@ const Home = () => {
         </div>
       </section>
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
