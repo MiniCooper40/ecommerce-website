@@ -8,6 +8,7 @@ spring:
   cloud:
     gateway:
       routes:
+        # Security Service - All public
         - id: security-service
           uri: http://localhost:8081
           predicates:
@@ -15,22 +16,51 @@ spring:
           filters:
             - StripPrefix=1
 
-        - id: catalog-service
+        # Catalog Service - Public product browsing
+        - id: catalog-service-public
           uri: http://localhost:8082
           predicates:
-            - Path=/api/catalog/**
+            - Path=/api/catalog/products/**, /api/catalog/categories/**
+          filters:
+            - StripPrefix=1
+
+        # Catalog Service - Admin only (product management)
+        - id: catalog-service-admin
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/catalog/admin/**
           filters:
             - StripPrefix=1
             - name: AuthenticationFilter
+            - name: RoleBasedAuthorizationFilter
+              args:
+                required-roles: ADMIN
 
-        - id: order-service
+        # Order Service - User access (own orders only)
+        - id: order-service-user
           uri: http://localhost:8083
           predicates:
             - Path=/api/orders/**
           filters:
             - StripPrefix=1
             - name: AuthenticationFilter
+            - name: RoleBasedAuthorizationFilter
+              args:
+                required-roles: USER,CUSTOMER
 
+        # Order Service - Admin access (all orders)
+        - id: order-service-admin
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/orders/admin/**
+          filters:
+            - StripPrefix=1
+            - name: AuthenticationFilter
+            - name: RoleBasedAuthorizationFilter
+              args:
+                required-roles: ADMIN
+
+        # Cart Service - Authenticated users only
         - id: cart-service
           uri: http://localhost:8084
           predicates:
@@ -38,6 +68,9 @@ spring:
           filters:
             - StripPrefix=1
             - name: AuthenticationFilter
+            - name: RoleBasedAuthorizationFilter
+              args:
+                required-roles: USER,CUSTOMER
 
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
