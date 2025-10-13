@@ -1,0 +1,31 @@
+{
+  "name": "ecommerce-monorepo",
+  "version": "1.0.0",
+  "description": "Ecommerce application with React frontend and Spring Boot microservices",
+  "private": true,
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "install:frontend": "cd frontend && npm install",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:frontend": "cd frontend && npm run build",
+    "start:backend": "docker-compose up -d gateway security-service catalog-service order-service",
+    "start:all": "docker-compose up -d",
+    "stop": "docker-compose down",
+    "clean": "docker-compose down -v",
+    "logs": "docker-compose logs -f"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.1"
+  },
+  "keywords": [
+    "ecommerce",
+    "react",
+    "spring-boot",
+    "microservices",
+    "monorepo"
+  ],
+  "author": "",
+  "license": "MIT"
+}
