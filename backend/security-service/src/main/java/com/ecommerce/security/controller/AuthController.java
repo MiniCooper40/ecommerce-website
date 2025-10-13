@@ -1,13 +1,21 @@
 package com.ecommerce.security.controller;
 
-import com.ecommerce.security.dto.LoginRequest;
-import com.ecommerce.security.dto.RegisterRequest;
-import com.ecommerce.security.dto.AuthResponse;
-import com.ecommerce.security.service.AuthService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ecommerce.security.dto.AuthResponse;
+import com.ecommerce.security.dto.LoginRequest;
+import com.ecommerce.security.dto.RegisterRequest;
+import com.ecommerce.security.service.AuthService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/auth")

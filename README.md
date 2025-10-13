@@ -5,14 +5,17 @@ A modern ecommerce application built with React frontend and Spring Boot microse
 ## Architecture
 
 ### Frontend
+
 - **React + TypeScript + Tailwind CSS** - Modern, responsive web application
 - **Vite** - Fast build tool and development server
 
 ### Backend Microservices
+
 - **Gateway Service** - API Gateway with request validation and principal injection
 - **Security Service** - Authentication and authorization
 - **Catalog Service** - Product catalog management
 - **Order Service** - Order processing and management
+- **Cart Service** - Shopping cart management
 
 ## Project Structure
 
@@ -22,7 +25,8 @@ A modern ecommerce application built with React frontend and Spring Boot microse
 │   ├── gateway/             # API Gateway
 │   ├── security-service/    # Authentication & Authorization
 │   ├── catalog-service/     # Product catalog
-│   └── order-service/       # Order management
+│   ├── order-service/       # Order management
+│   └── cart-service/        # Shopping cart management
 ├── docker-compose.yml       # Local development environment
 └── README.md
 ```
@@ -30,6 +34,7 @@ A modern ecommerce application built with React frontend and Spring Boot microse
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - Java 17+
 - Docker & Docker Compose
@@ -38,11 +43,13 @@ A modern ecommerce application built with React frontend and Spring Boot microse
 ### Quick Setup
 
 **Windows (PowerShell):**
+
 ```powershell
 .\setup.ps1
 ```
 
 **Linux/Mac:**
+
 ```bash
 chmod +x setup.sh
 ./setup.sh
@@ -51,6 +58,7 @@ chmod +x setup.sh
 ### Manual Setup
 
 1. **Install Dependencies**
+
    ```bash
    npm run install:frontend
    ```
@@ -68,11 +76,13 @@ chmod +x setup.sh
 ### Development Options
 
 **Option 1: Full Stack Development (Recommended)**
+
 ```bash
 npm run start:all
 ```
 
 **Option 2: Frontend + Backend Services**
+
 ```bash
 # Terminal 1: Start backend services
 npm run start:backend
@@ -82,6 +92,7 @@ npm run dev:frontend
 ```
 
 **Option 3: Individual Service Development**
+
 ```bash
 # Start specific backend services
 cd backend/[service-name]
@@ -104,21 +115,25 @@ npm run dev:frontend
 ## Service URLs
 
 Once services are running:
+
 - **Frontend**: http://localhost:3000
 - **API Gateway**: http://localhost:8080
 - **Security Service**: http://localhost:8081
 - **Catalog Service**: http://localhost:8082
 - **Order Service**: http://localhost:8083
+- **Cart Service**: http://localhost:8084
 
 ## API Endpoints
 
 ### Authentication (via Gateway)
+
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/login` - User login
 - `POST /api/auth/refresh` - Refresh token
 - `GET /api/auth/validate` - Validate token
 
 ### Catalog (via Gateway)
+
 - `GET /api/catalog/products` - Get all products (paginated)
 - `GET /api/catalog/products/{id}` - Get product by ID
 - `GET /api/catalog/products/category/{category}` - Get products by category
@@ -127,14 +142,26 @@ Once services are running:
 - `DELETE /api/catalog/products/{id}` - Delete product (admin)
 
 ### Orders (via Gateway) - Requires Authentication
+
 - `GET /api/orders` - Get user orders
 - `GET /api/orders/{id}` - Get specific order
 - `POST /api/orders` - Create new order
 - `PUT /api/orders/{id}/cancel` - Cancel order
 
+### Cart (via Gateway) - Requires Authentication
+
+- `GET /api/cart` - Get user's cart with summary
+- `POST /api/cart/items` - Add item to cart
+- `PUT /api/cart/items/{itemId}` - Update cart item
+- `DELETE /api/cart/items/{itemId}` - Remove item from cart
+- `PUT /api/cart/items/{itemId}/quantity` - Update item quantity
+- `DELETE /api/cart` - Clear entire cart
+- `GET /api/cart/count` - Get total items count in cart
+
 ## Development Notes
 
 ### Architecture Decisions
+
 - **Gateway Pattern**: All external requests go through the API Gateway
 - **JWT Authentication**: Stateless authentication using JSON Web Tokens
 - **Principal Injection**: Gateway extracts user info from JWT and passes to services via headers
@@ -142,12 +169,14 @@ Once services are running:
 - **Modern Frontend**: React 18 + TypeScript + Tailwind CSS + Vite for fast development
 
 ### Security Features
+
 - JWT-based authentication
 - Request validation at gateway level
 - CORS configuration for cross-origin requests
 - Principal injection for user context
 
 ### Development Features
+
 - Hot reload for frontend development
 - Automatic restart for Spring Boot services
 - Health checks and metrics endpoints

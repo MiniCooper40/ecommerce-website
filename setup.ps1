@@ -36,6 +36,11 @@ if (!(Test-Path "backend\order-service\.env")) {
     Write-Host "✅ Created backend\order-service\.env" -ForegroundColor Green
 }
 
+if (!(Test-Path "backend\cart-service\.env")) {
+    Copy-Item "backend\cart-service\.env.example" "backend\cart-service\.env"
+    Write-Host "✅ Created backend\cart-service\.env" -ForegroundColor Green
+}
+
 Write-Host ""
 Write-Host "✨ Setup complete! You can now:" -ForegroundColor Green
 Write-Host ""
@@ -54,3 +59,4 @@ Write-Host "   Gateway: http://localhost:8080"
 Write-Host "   Security Service: http://localhost:8081"
 Write-Host "   Catalog Service: http://localhost:8082"
 Write-Host "   Order Service: http://localhost:8083"
+Write-Host "   Cart Service: http://localhost:8084"

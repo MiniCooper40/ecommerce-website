@@ -38,6 +38,11 @@ if [ ! -f backend/order-service/.env ]; then
     echo "✅ Created backend/order-service/.env"
 fi
 
+if [ ! -f backend/cart-service/.env ]; then
+    cp backend/cart-service/.env.example backend/cart-service/.env
+    echo "✅ Created backend/cart-service/.env"
+fi
+
 echo ""
 echo "✨ Setup complete! You can now:"
 echo ""
@@ -56,3 +61,4 @@ echo "   Gateway: http://localhost:8080"
 echo "   Security Service: http://localhost:8081"
 echo "   Catalog Service: http://localhost:8082"
 echo "   Order Service: http://localhost:8083"
+echo "   Cart Service: http://localhost:8084"

@@ -1,9 +1,9 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # Gateway Service
   gateway:
-    build: 
+    build:
       context: ./backend/gateway
       dockerfile: Dockerfile
     ports:
@@ -14,6 +14,7 @@ services:
       - security-service
       - catalog-service
       - order-service
+      - cart-service
     networks:
       - ecommerce-network
 
@@ -50,6 +51,28 @@ services:
       - "8083:8083"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - ecommerce-network
+
+  # Cart Service
+  cart-service:
+    build:
+      context: ./backend/cart-service
+      dockerfile: Dockerfile
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - redis
+    networks:
+      - ecommerce-network
+
+  # Redis for cart session storage
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
     networks:
       - ecommerce-network
 

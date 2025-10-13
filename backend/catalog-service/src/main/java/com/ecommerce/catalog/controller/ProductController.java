@@ -1,15 +1,17 @@
 package com.ecommerce.catalog.controller;
 
-import com.ecommerce.catalog.dto.ProductDto;
-import com.ecommerce.catalog.service.ProductService;
-import jakarta.validation.Valid;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import com.ecommerce.catalog.dto.ProductDto;
+import com.ecommerce.catalog.service.ProductService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/products")
