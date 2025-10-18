@@ -70,10 +70,10 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             String jwtToken = token.substring(7);
             SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
             
-            Jwts.parserBuilder()
-                .setSigningKey(key)
+            Jwts.parser()
+                .verifyWith(key)
                 .build()
-                .parseClaimsJws(jwtToken);
+                .parseSignedClaims(jwtToken);
                 
             return false;
         } catch (Exception e) {
@@ -86,11 +86,11 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             String jwtToken = token.substring(7);
             SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
             
-            Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key)
+            Claims claims = Jwts.parser()
+                .verifyWith(key)
                 .build()
-                .parseClaimsJws(jwtToken)
-                .getBody();
+                .parseSignedClaims(jwtToken)
+                .getPayload();
             
             exchange.getRequest().mutate()
                 .header("X-User-Id", claims.getSubject())
