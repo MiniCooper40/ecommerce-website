@@ -1,6 +1,18 @@
 version: "3.8"
 
 services:
+  # Eureka Discovery Server
+  eureka-server:
+    build:
+      context: ./backend/eureka-server
+      dockerfile: Dockerfile
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - ecommerce-network
+
   # Gateway Service
   gateway:
     build:
@@ -11,6 +23,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
+      - eureka-server
       - security-service
       - catalog-service
       - order-service
@@ -27,6 +40,8 @@ services:
       - "8081:8081"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - eureka-server
     networks:
       - ecommerce-network
 
@@ -39,6 +54,8 @@ services:
       - "8082:8082"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - eureka-server
     networks:
       - ecommerce-network
 
@@ -51,6 +68,8 @@ services:
       - "8083:8083"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - eureka-server
     networks:
       - ecommerce-network
 
@@ -64,6 +83,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
+      - eureka-server
       - redis
     networks:
       - ecommerce-network

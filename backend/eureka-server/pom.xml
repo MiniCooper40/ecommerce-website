@@ -6,12 +6,12 @@
     <modelVersion>4.0.0</modelVersion>
     
     <groupId>com.ecommerce</groupId>
-    <artifactId>order-service</artifactId>
+    <artifactId>eureka-server</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
     
-    <name>Order Service</name>
-    <description>Order Processing and Management Service</description>
+    <name>Eureka Discovery Server</name>
+    <description>Service Discovery Server for Ecommerce Application</description>
     
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -27,34 +27,13 @@
     
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
         </dependency>
         
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-        </dependency>
-        
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>runtime</scope>
         </dependency>
         
         <dependency>

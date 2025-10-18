@@ -7,10 +7,14 @@ spring:
 
   cloud:
     gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
       routes:
         # Security Service - All public
         - id: security-service
-          uri: http://localhost:8081
+          uri: lb://security-service
           predicates:
             - Path=/api/auth/**
           filters:
@@ -18,7 +22,7 @@ spring:
 
         # Catalog Service - Public product browsing
         - id: catalog-service-public
-          uri: http://localhost:8082
+          uri: lb://catalog-service
           predicates:
             - Path=/api/catalog/products/**, /api/catalog/categories/**
           filters:
@@ -26,7 +30,7 @@ spring:
 
         # Catalog Service - Admin only (product management)
         - id: catalog-service-admin
-          uri: http://localhost:8082
+          uri: lb://catalog-service
           predicates:
             - Path=/api/catalog/admin/**
           filters:
@@ -38,7 +42,7 @@ spring:
 
         # Order Service - User access (own orders only)
         - id: order-service-user
-          uri: http://localhost:8083
+          uri: lb://order-service
           predicates:
             - Path=/api/orders/**
           filters:
@@ -50,7 +54,7 @@ spring:
 
         # Order Service - Admin access (all orders)
         - id: order-service-admin
-          uri: http://localhost:8083
+          uri: lb://order-service
           predicates:
             - Path=/api/orders/admin/**
           filters:
@@ -62,7 +66,7 @@ spring:
 
         # Cart Service - Authenticated users only
         - id: cart-service
-          uri: http://localhost:8084
+          uri: lb://cart-service
           predicates:
             - Path=/api/cart/**
           filters:
@@ -85,6 +89,18 @@ spring:
         jwt:
           jwk-set-uri: http://localhost:8081/auth/.well-known/jwks.json
 
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://security-service:8081/auth/.well-known/jwks.json
+
 management:
   endpoints:
     web:
@@ -94,8 +110,33 @@ management:
     health:
       show-details: always
 
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+
 logging:
   level:
-    org.springframework.cloud.gateway: DEBUG
-    org.springframework.security: DEBUG
-    com.ecommerce.gateway: DEBUG
+    "[org.springframework.cloud.gateway]": DEBUG
+    "[org.springframework.security]": DEBUG
+    "[com.ecommerce.gateway]": DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+  instance:
+    prefer-ip-address: false
+    hostname: gateway
