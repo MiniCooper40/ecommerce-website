@@ -71,7 +71,6 @@ public class OrderServiceImpl implements OrderService {
                     item.setProductName("Product " + itemRequest.getProductId()); // Mock product name
                     item.setQuantity(itemRequest.getQuantity());
                     item.setPrice(new BigDecimal("10.00")); // Mock price
-                    item.setSubtotal(item.getPrice().multiply(BigDecimal.valueOf(itemRequest.getQuantity())));
                     return item;
                 })
                 .collect(Collectors.toList());
