@@ -43,14 +43,14 @@ public class CartServiceImpl implements CartService {
             cartItem.setQuantity(cartItem.getQuantity() + cartItemDto.getQuantity());
         } else {
             // Create new cart item
-            cartItem = new CartItem(
-                    userId,
-                    cartItemDto.getProductId(),
-                    cartItemDto.getProductName(),
-                    cartItemDto.getProductPrice(),
-                    cartItemDto.getProductImageUrl(),
-                    cartItemDto.getQuantity()
-            );
+            cartItem = CartItem.builder()
+                    .userId(userId)
+                    .productId(cartItemDto.getProductId())
+                    .productName(cartItemDto.getProductName())
+                    .productPrice(cartItemDto.getProductPrice())
+                    .productImageUrl(cartItemDto.getProductImageUrl())
+                    .quantity(cartItemDto.getQuantity())
+                    .build();
         }
 
         cartItem = cartItemRepository.save(cartItem);
@@ -104,15 +104,15 @@ public class CartServiceImpl implements CartService {
     }
 
     private CartItemDto convertToDto(CartItem cartItem) {
-        CartItemDto dto = new CartItemDto();
-        dto.setId(cartItem.getId());
-        dto.setProductId(cartItem.getProductId());
-        dto.setProductName(cartItem.getProductName());
-        dto.setProductPrice(cartItem.getProductPrice());
-        dto.setProductImageUrl(cartItem.getProductImageUrl());
-        dto.setQuantity(cartItem.getQuantity());
-        dto.setCreatedAt(cartItem.getCreatedAt());
-        dto.setUpdatedAt(cartItem.getUpdatedAt());
-        return dto;
+        return CartItemDto.builder()
+                .id(cartItem.getId())
+                .productId(cartItem.getProductId())
+                .productName(cartItem.getProductName())
+                .productPrice(cartItem.getProductPrice())
+                .productImageUrl(cartItem.getProductImageUrl())
+                .quantity(cartItem.getQuantity())
+                .createdAt(cartItem.getCreatedAt())
+                .updatedAt(cartItem.getUpdatedAt())
+                .build();
     }
 }
