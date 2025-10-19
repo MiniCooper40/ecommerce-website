@@ -10,10 +10,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ecommerce.order.dto.CreateOrderRequest;
 import com.ecommerce.order.dto.OrderDto;
-import com.ecommerce.order.dto.OrderItemDto;
+import com.ecommerce.order.entity.Address;
+import com.ecommerce.order.entity.AddressType;
 import com.ecommerce.order.entity.Order;
 import com.ecommerce.order.entity.OrderItem;
 import com.ecommerce.order.entity.OrderStatus;
+import com.ecommerce.order.mapper.OrderMapper;
 import com.ecommerce.order.repository.OrderRepository;
 
 /**
@@ -26,6 +28,12 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderRepository orderRepository;
     
+    @Autowired
+    private AddressService addressService;
+    
+    @Autowired
+    private OrderMapper orderMapper;
+    
     /**
      * Get all orders for a user
      */
@@ -33,9 +41,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public List<OrderDto> getUserOrders(String userId) {
         List<Order> orders = orderRepository.findByUserIdWithItems(userId);
-        return orders.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
+        return orderMapper.toDtoList(orders);
     }
     
     /**
@@ -46,7 +52,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderDto getOrder(Long id, String userId) {
         Order order = orderRepository.findByIdAndUserIdWithItems(id, userId)
                 .orElseThrow(() -> new RuntimeException("Order not found or not accessible"));
-        return convertToDto(order);
+        return orderMapper.toDto(order);
     }
     
     /**
@@ -54,12 +60,19 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public OrderDto createOrder(CreateOrderRequest request, String userId) {
+        // Create addresses first
+        Address shippingAddress = addressService.convertToEntity(request.getShippingAddress());
+        shippingAddress.setType(AddressType.SHIPPING);
+        
+        Address billingAddress = addressService.convertToEntity(request.getBillingAddress());
+        billingAddress.setType(AddressType.BILLING);
+        
         // Create the order
         Order order = new Order();
         order.setUserId(userId);
         order.setStatus(OrderStatus.PENDING);
-        order.setShippingAddress(request.getShippingAddress());
-        order.setBillingAddress(request.getBillingAddress());
+        order.setShippingAddress(shippingAddress);
+        order.setBillingAddress(billingAddress);
         
         // Create order items (in a real app, you'd fetch product details from catalog service)
         List<OrderItem> orderItems = request.getItems().stream()
@@ -85,7 +98,7 @@ public class OrderServiceImpl implements OrderService {
         
         // Save the order
         Order savedOrder = orderRepository.save(order);
-        return convertToDto(savedOrder);
+        return orderMapper.toDto(savedOrder);
     }
     
     /**
@@ -102,7 +115,7 @@ public class OrderServiceImpl implements OrderService {
         
         order.setStatus(OrderStatus.CANCELLED);
         Order savedOrder = orderRepository.save(order);
-        return convertToDto(savedOrder);
+        return orderMapper.toDto(savedOrder);
     }
     
     /**
@@ -112,45 +125,6 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public List<OrderDto> getAllOrders() {
         List<Order> orders = orderRepository.findAll();
-        return orders.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-    }
-    
-    /**
-     * Convert Order entity to OrderDto
-     */
-    private OrderDto convertToDto(Order order) {
-        List<OrderItemDto> itemDtos = order.getItems() != null 
-                ? order.getItems().stream()
-                    .map(this::convertItemToDto)
-                    .collect(Collectors.toList())
-                : java.util.List.of();
-        
-        return new OrderDto(
-                order.getId(),
-                order.getUserId(),
-                order.getStatus(),
-                order.getTotalAmount(),
-                order.getCreatedAt(),
-                order.getUpdatedAt(),
-                order.getShippingAddress(),
-                order.getBillingAddress(),
-                itemDtos
-        );
-    }
-    
-    /**
-     * Convert OrderItem entity to OrderItemDto
-     */
-    private OrderItemDto convertItemToDto(OrderItem item) {
-        return new OrderItemDto(
-                item.getId(),
-                item.getProductId(),
-                item.getProductName(),
-                item.getQuantity(),
-                item.getPrice(),
-                item.getSubtotal()
-        );
+        return orderMapper.toDtoList(orders);
     }
 }

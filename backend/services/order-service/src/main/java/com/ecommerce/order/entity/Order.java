@@ -18,6 +18,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -57,18 +59,20 @@ public class Order {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
     
-    @Column(name = "shipping_address", nullable = false, length = 500)
-    private String shippingAddress;
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "shipping_address_id", nullable = false)
+    private Address shippingAddress;
     
-    @Column(name = "billing_address", nullable = false, length = 500)
-    private String billingAddress;
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "billing_address_id", nullable = false)
+    private Address billingAddress;
     
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderItem> items;
 
     // Custom constructor for common use case
     public Order(String userId, OrderStatus status, BigDecimal totalAmount, 
-                String shippingAddress, String billingAddress) {
+                Address shippingAddress, Address billingAddress) {
         this.userId = userId;
         this.status = status;
         this.totalAmount = totalAmount;

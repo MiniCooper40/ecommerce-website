@@ -1,0 +1,65 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Debug Eureka Server",
+            "request": "launch",
+            "mainClass": "com.ecommerce.eureka.EurekaServerApplication",
+            "projectName": "eureka-server",
+            "cwd": "${workspaceFolder}/backend/services/eureka-server",
+            "args": "",
+            "envFile": "${workspaceFolder}/backend/services/eureka-server/.env"
+        },
+        {
+            "type": "java", 
+            "name": "Debug Gateway",
+            "request": "launch",
+            "mainClass": "com.ecommerce.gateway.GatewayApplication",
+            "projectName": "gateway",
+            "cwd": "${workspaceFolder}/backend/services/gateway",
+            "args": "",
+            "envFile": "${workspaceFolder}/backend/services/gateway/.env"
+        },
+        {
+            "type": "java",
+            "name": "Debug Cart Service", 
+            "request": "launch",
+            "mainClass": "com.ecommerce.cart.CartServiceApplication",
+            "projectName": "cart-service",
+            "cwd": "${workspaceFolder}/backend/services/cart-service",
+            "args": "",
+            "envFile": "${workspaceFolder}/backend/services/cart-service/.env"
+        },
+        {
+            "type": "java",
+            "name": "Debug Catalog Service",
+            "request": "launch", 
+            "mainClass": "com.ecommerce.catalog.CatalogServiceApplication",
+            "projectName": "catalog-service",
+            "cwd": "${workspaceFolder}/backend/services/catalog-service",
+            "args": "",
+            "envFile": "${workspaceFolder}/backend/services/catalog-service/.env"
+        },
+        {
+            "type": "java",
+            "name": "Debug Order Service",
+            "request": "launch",
+            "mainClass": "com.ecommerce.order.OrderServiceApplication", 
+            "projectName": "order-service",
+            "cwd": "${workspaceFolder}/backend/services/order-service",
+            "args": "",
+            "envFile": "${workspaceFolder}/backend/services/order-service/.env"
+        },
+        {
+            "type": "java",
+            "name": "Debug Security Service",
+            "request": "launch",
+            "mainClass": "com.ecommerce.security.SecurityServiceApplication",
+            "projectName": "security-service", 
+            "cwd": "${workspaceFolder}/backend/services/security-service",
+            "args": "",
+            "envFile": "${workspaceFolder}/backend/services/security-service/.env"
+        }
+    ]
+}

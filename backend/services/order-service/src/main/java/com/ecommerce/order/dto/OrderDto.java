@@ -9,6 +9,7 @@ import com.ecommerce.order.entity.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.ecommerce.order.dto.AddressDto;
 
 /**
  * DTO for Order responses
@@ -23,7 +24,7 @@ public class OrderDto {
     private BigDecimal totalAmount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private String shippingAddress;
-    private String billingAddress;
+    private AddressDto shippingAddress;
+    private AddressDto billingAddress;
     private List<OrderItemDto> items;
 }

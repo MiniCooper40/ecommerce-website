@@ -29,6 +29,10 @@ import com.ecommerce.order.service.OrderService;
 import com.ecommerce.shared.testutil.WithMockUserPrincipal;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.ecommerce.order.dto.AddressDto;
+import com.ecommerce.order.dto.CreateAddressRequest;
+import com.ecommerce.order.entity.AddressType;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 public class OrderControllerTest {
@@ -152,13 +156,15 @@ public class OrderControllerTest {
         order.setStatus(OrderStatus.PENDING);
         order.setTotalAmount(new BigDecimal("99.99"));
         order.setCreatedAt(LocalDateTime.now());
+        order.setShippingAddress(createSampleShippingAddress());
+        order.setBillingAddress(createSampleBillingAddress());
         return order;
     }
 
     private CreateOrderRequest createSampleOrderRequest() {
         CreateOrderRequest request = new CreateOrderRequest();
-        request.setShippingAddress("123 Main St, Anytown, ST 12345");
-        request.setBillingAddress("456 Oak Ave, Somewhere, ST 67890");
+        request.setShippingAddress(createSampleShippingAddressRequest());
+        request.setBillingAddress(createSampleBillingAddressRequest());
         
         // Create sample order items
         CreateOrderItemRequest item1 = new CreateOrderItemRequest();
@@ -170,6 +176,56 @@ public class OrderControllerTest {
         item2.setQuantity(1);
         
         request.setItems(Arrays.asList(item1, item2));
+        return request;
+    }
+
+    private AddressDto createSampleShippingAddress() {
+        AddressDto address = new AddressDto();
+        address.setId(1L);
+        address.setType(AddressType.SHIPPING);
+        address.setStreet("123 Main St");
+        address.setCity("Anytown");
+        address.setState("ST");
+        address.setZipCode("12345");
+        address.setCountry("USA");
+        address.setCreatedAt(LocalDateTime.now());
+        address.setUpdatedAt(LocalDateTime.now());
+        return address;
+    }
+
+    private AddressDto createSampleBillingAddress() {
+        AddressDto address = new AddressDto();
+        address.setId(2L);
+        address.setType(AddressType.BILLING);
+        address.setStreet("456 Oak Ave");
+        address.setCity("Somewhere");
+        address.setState("ST");
+        address.setZipCode("67890");
+        address.setCountry("USA");
+        address.setCreatedAt(LocalDateTime.now());
+        address.setUpdatedAt(LocalDateTime.now());
+        return address;
+    }
+
+    private CreateAddressRequest createSampleShippingAddressRequest() {
+        CreateAddressRequest request = new CreateAddressRequest();
+        request.setType(AddressType.SHIPPING);
+        request.setStreet("123 Main St");
+        request.setCity("Anytown");
+        request.setState("ST");
+        request.setZipCode("12345");
+        request.setCountry("USA");
+        return request;
+    }
+
+    private CreateAddressRequest createSampleBillingAddressRequest() {
+        CreateAddressRequest request = new CreateAddressRequest();
+        request.setType(AddressType.BILLING);
+        request.setStreet("456 Oak Ave");
+        request.setCity("Somewhere");
+        request.setState("ST");
+        request.setZipCode("67890");
+        request.setCountry("USA");
         return request;
     }
 }

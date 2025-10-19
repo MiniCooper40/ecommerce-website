@@ -31,11 +31,16 @@ ehthumbs.db
 Thumbs.db
 
 # IDEs
-.vscode/
 .idea/
 *.swp
 *.swo
 *~
+
+# VS Code - Allow workspace configuration, exclude user-specific settings
+.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
 # Java
 *.class
