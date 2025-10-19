@@ -8,10 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import main.java.com.ecommerce.cart.dto.CartItemDto;
-import main.java.com.ecommerce.cart.dto.CartSummaryDto;
-import main.java.com.ecommerce.cart.entity.CartItem;
-import main.java.com.ecommerce.cart.repository.CartItemRepository;
+import com.ecommerce.cart.dto.CartItemDto;
+import com.ecommerce.cart.dto.CartSummaryDto;
+import com.ecommerce.cart.entity.CartItem;
+import com.ecommerce.cart.repository.CartItemRepository;
 
 @Service
 @Transactional

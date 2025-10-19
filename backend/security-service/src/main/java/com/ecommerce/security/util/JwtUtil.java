@@ -1,11 +1,16 @@
 package com.ecommerce.security.util;
 
-import java.nio.charset.StandardCharsets;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
-
-import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,28 +20,58 @@ import com.ecommerce.security.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.secret:mySecretKey}")
-    private String jwtSecret;
-
     @Value("${jwt.expiration:86400000}")
     private Long jwtExpiration;
 
-    private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+    private RSAPrivateKey privateKey;
+    private RSAPublicKey publicKey;
+    private String keyId;
+
+    @PostConstruct
+    public void init() {
+        try {
+            // Generate RSA key pair for JWT signing
+            KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("RSA");
+            keyGenerator.initialize(2048);
+            KeyPair keyPair = keyGenerator.generateKeyPair();
+            
+            this.privateKey = (RSAPrivateKey) keyPair.getPrivate();
+            this.publicKey = (RSAPublicKey) keyPair.getPublic();
+            this.keyId = UUID.randomUUID().toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Failed to generate RSA key pair", e);
+        }
+    }
+
+    private PrivateKey getSigningKey() {
+        return privateKey;
+    }
+
+    public PublicKey getPublicKey() {
+        return publicKey;
+    }
+
+    public String getKeyId() {
+        return keyId;
     }
 
     public String generateToken(User user) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpiration);
+        // Add small random component to ensure unique timestamps even in rapid succession
+        long nowTime = System.currentTimeMillis() + (System.nanoTime() % 1000) + (int)(Math.random() * 1000);
+        Date now = new Date(nowTime);
+        Date expiryDate = new Date(nowTime + jwtExpiration);
 
         List<String> roles = user.getRoles().stream()
                 .map(role -> role.getName().name())
                 .collect(Collectors.toList());
+
+        // Generate unique JWT ID to ensure token uniqueness
+        String jwtId = java.util.UUID.randomUUID().toString();
 
         return Jwts.builder()
                 .subject(user.getId().toString())
@@ -44,6 +79,7 @@ public class JwtUtil {
                 .claim("firstName", user.getFirstName())
                 .claim("lastName", user.getLastName())
                 .claim("roles", roles)
+                .id(jwtId)  // Add unique JWT ID
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getSigningKey())
@@ -52,7 +88,7 @@ public class JwtUtil {
 
     public String getUserIdFromToken(String token) {
         Claims claims = Jwts.parser()
-                .verifyWith(getSigningKey())
+                .verifyWith(publicKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -62,7 +98,7 @@ public class JwtUtil {
 
     public String getEmailFromToken(String token) {
         Claims claims = Jwts.parser()
-                .verifyWith(getSigningKey())
+                .verifyWith(publicKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -73,7 +109,7 @@ public class JwtUtil {
     @SuppressWarnings("unchecked")
     public List<String> getRolesFromToken(String token) {
         Claims claims = Jwts.parser()
-                .verifyWith(getSigningKey())
+                .verifyWith(publicKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -83,7 +119,7 @@ public class JwtUtil {
 
     public Date getExpirationDateFromToken(String token) {
         Claims claims = Jwts.parser()
-                .verifyWith(getSigningKey())
+                .verifyWith(publicKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -99,7 +135,7 @@ public class JwtUtil {
     public Boolean validateToken(String token) {
         try {
             Jwts.parser()
-                .verifyWith(getSigningKey())
+                .verifyWith(publicKey)
                 .build()
                 .parseSignedClaims(token);
             return true;
@@ -116,17 +152,37 @@ public class JwtUtil {
     public String refreshToken(String token) {
         try {
             Claims claims = Jwts.parser()
-                    .verifyWith(getSigningKey())
+                    .verifyWith(publicKey)
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
 
+            // Ensure timestamp uniqueness by guaranteeing a different iat
+            Date originalIat = claims.getIssuedAt();
             Date now = new Date();
-            Date expiryDate = new Date(now.getTime() + jwtExpiration);
+            
+            // Always ensure new iat is at least 1 second after original, or current time if later
+            long newIatTime = Math.max(now.getTime(), 
+                (originalIat != null ? originalIat.getTime() + 1000 : now.getTime()));
+            
+            // Add small random component to prevent any potential collisions
+            newIatTime += (System.nanoTime() % 1000);
+            
+            Date newIat = new Date(newIatTime);
+            Date expiryDate = new Date(newIatTime + jwtExpiration);
 
+            // Generate new unique JWT ID for refreshed token
+            String newJwtId = java.util.UUID.randomUUID().toString();
+
+            // Create a new token with guaranteed unique timestamp and ID
             return Jwts.builder()
-                    .claims(claims)
-                    .issuedAt(now)
+                    .subject(claims.getSubject())
+                    .claim("email", claims.get("email"))
+                    .claim("firstName", claims.get("firstName"))
+                    .claim("lastName", claims.get("lastName"))
+                    .claim("roles", claims.get("roles"))
+                    .id(newJwtId)  // Add unique JWT ID
+                    .issuedAt(newIat)
                     .expiration(expiryDate)
                     .signWith(getSigningKey())
                     .compact();

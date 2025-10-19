@@ -8,13 +8,22 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "roles")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Enumerated(EnumType.STRING)
@@ -24,41 +33,9 @@ public class Role {
     @Column(name = "description")
     private String description;
 
-    // Constructors
-    public Role() {}
-
+    // Custom constructor
     public Role(RoleName name) {
         this.name = name;
-    }
-
-    public Role(RoleName name, String description) {
-        this.name = name;
-        this.description = description;
-    }
-
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public RoleName getName() {
-        return name;
-    }
-
-    public void setName(RoleName name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     // Enum for role names
@@ -79,8 +56,9 @@ public class Role {
         }
     }
 
+    // Custom toString method
     @Override
     public String toString() {
-        return name.name();
+        return name != null ? name.name() : "UNKNOWN";
     }
 }

@@ -23,7 +23,9 @@ public class DataInitializationService implements CommandLineRunner {
         // Create default roles if they don't exist
         for (RoleName roleName : RoleName.values()) {
             if (!roleRepository.existsByName(roleName)) {
-                Role role = new Role(roleName, roleName.getDescription());
+                Role role = new Role();
+                role.setName(roleName);
+                role.setDescription(roleName.getDescription());
                 roleRepository.save(role);
                 System.out.println("Created role: " + roleName.name());
             }

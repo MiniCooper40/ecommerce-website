@@ -37,6 +37,13 @@ spring:
           max-idle: 8
           min-idle: 0
 
+  # JWT Resource Server Configuration
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8081/.well-known/jwks.json
+
 management:
   endpoints:
     web:
@@ -71,6 +78,13 @@ spring:
     redis:
       host: redis
       port: 6379
+
+  # JWT Resource Server Configuration for Docker
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://security-service:8081/.well-known/jwks.json
 
 eureka:
   client:

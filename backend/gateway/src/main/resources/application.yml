@@ -12,7 +12,7 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
-        # Security Service - All public
+        # Security Service - Authentication endpoints
         - id: security-service
           uri: lb://security-service
           predicates:
@@ -20,61 +20,29 @@ spring:
           filters:
             - StripPrefix=1
 
-        # Catalog Service - Public product browsing
-        - id: catalog-service-public
+        # Catalog Service - All product endpoints (services handle their own auth)
+        - id: catalog-service
           uri: lb://catalog-service
           predicates:
-            - Path=/api/catalog/products/**, /api/catalog/categories/**
+            - Path=/api/catalog/**
           filters:
             - StripPrefix=1
 
-        # Catalog Service - Admin only (product management)
-        - id: catalog-service-admin
-          uri: lb://catalog-service
-          predicates:
-            - Path=/api/catalog/admin/**
-          filters:
-            - StripPrefix=1
-            - name: AuthenticationFilter
-            - name: RoleBasedAuthorizationFilter
-              args:
-                required-roles: ADMIN
-
-        # Order Service - User access (own orders only)
-        - id: order-service-user
+        # Order Service - All order endpoints (services handle their own auth)
+        - id: order-service
           uri: lb://order-service
           predicates:
             - Path=/api/orders/**
           filters:
             - StripPrefix=1
-            - name: AuthenticationFilter
-            - name: RoleBasedAuthorizationFilter
-              args:
-                required-roles: USER,CUSTOMER
 
-        # Order Service - Admin access (all orders)
-        - id: order-service-admin
-          uri: lb://order-service
-          predicates:
-            - Path=/api/orders/admin/**
-          filters:
-            - StripPrefix=1
-            - name: AuthenticationFilter
-            - name: RoleBasedAuthorizationFilter
-              args:
-                required-roles: ADMIN
-
-        # Cart Service - Authenticated users only
+        # Cart Service - All cart endpoints (services handle their own auth)
         - id: cart-service
           uri: lb://cart-service
           predicates:
             - Path=/api/cart/**
           filters:
             - StripPrefix=1
-            - name: AuthenticationFilter
-            - name: RoleBasedAuthorizationFilter
-              args:
-                required-roles: USER,CUSTOMER
 
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
@@ -82,24 +50,6 @@ spring:
         - AddResponseHeader=Access-Control-Allow-Methods, GET,POST,PUT,DELETE,OPTIONS
         - AddResponseHeader=Access-Control-Allow-Headers, *
         - AddResponseHeader=Access-Control-Max-Age, 3600
-
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: http://localhost:8081/auth/.well-known/jwks.json
-
----
-spring:
-  config:
-    activate:
-      on-profile: docker
-
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: http://security-service:8081/auth/.well-known/jwks.json
 
 management:
   endpoints:
@@ -124,7 +74,6 @@ eureka:
 logging:
   level:
     "[org.springframework.cloud.gateway]": DEBUG
-    "[org.springframework.security]": DEBUG
     "[com.ecommerce.gateway]": DEBUG
 
 ---
