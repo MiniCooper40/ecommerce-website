@@ -3,6 +3,11 @@ package com.ecommerce.cart.dto;
 import java.math.BigDecimal;
 import java.util.List;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
 public class CartSummaryDto {
     
     private List<CartItemDto> items;
@@ -12,62 +17,16 @@ public class CartSummaryDto {
     private BigDecimal shipping;
     private BigDecimal total;
 
-    // Constructors
-    public CartSummaryDto() {}
-
+    // Custom constructor that calculates totals
     public CartSummaryDto(List<CartItemDto> items) {
         this.items = items;
         this.calculateTotals();
     }
 
-    // Getters and Setters
-    public List<CartItemDto> getItems() {
-        return items;
-    }
-
+    // Custom setter for items that recalculates totals
     public void setItems(List<CartItemDto> items) {
         this.items = items;
         this.calculateTotals();
-    }
-
-    public Integer getTotalItems() {
-        return totalItems;
-    }
-
-    public void setTotalItems(Integer totalItems) {
-        this.totalItems = totalItems;
-    }
-
-    public BigDecimal getSubtotal() {
-        return subtotal;
-    }
-
-    public void setSubtotal(BigDecimal subtotal) {
-        this.subtotal = subtotal;
-    }
-
-    public BigDecimal getTax() {
-        return tax;
-    }
-
-    public void setTax(BigDecimal tax) {
-        this.tax = tax;
-    }
-
-    public BigDecimal getShipping() {
-        return shipping;
-    }
-
-    public void setShipping(BigDecimal shipping) {
-        this.shipping = shipping;
-    }
-
-    public BigDecimal getTotal() {
-        return total;
-    }
-
-    public void setTotal(BigDecimal total) {
-        this.total = total;
     }
 
     // Utility methods
