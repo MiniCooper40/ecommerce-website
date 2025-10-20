@@ -9,7 +9,6 @@ import com.ecommerce.order.entity.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.ecommerce.order.dto.AddressDto;
 
 /**
  * DTO for Order responses

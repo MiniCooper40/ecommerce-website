@@ -27,17 +27,18 @@ public class AddressServiceImpl implements AddressService {
     private AddressMapper addressMapper;
     
     /**
-     * Create a new address
+     * Create a new address for a user
      */
     @Override
-    public AddressDto createAddress(CreateAddressRequest request) {
+    public AddressDto createAddress(CreateAddressRequest request, String userId) {
         Address address = addressMapper.toEntity(request);
+        address.setUserId(userId);
         Address savedAddress = addressRepository.save(address);
         return addressMapper.toDto(savedAddress);
     }
     
     /**
-     * Get address by ID
+     * Get address by ID (for any user - admin only)
      */
     @Override
     @Transactional(readOnly = true)
@@ -48,12 +49,59 @@ public class AddressServiceImpl implements AddressService {
     }
     
     /**
-     * Get all addresses by type
+     * Get address by ID for a specific user (security check)
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public AddressDto getUserAddress(Long id, String userId) {
+        Address address = addressRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new RuntimeException("Address not found or not accessible"));
+        return addressMapper.toDto(address);
+    }
+    
+    /**
+     * Get all addresses for a user
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<AddressDto> getUserAddresses(String userId) {
+        List<Address> addresses = addressRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        return addresses.stream()
+                .map(addressMapper::toDto)
+                .collect(java.util.stream.Collectors.toList());
+    }
+    
+    /**
+     * Get all addresses by type for a user
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<AddressDto> getUserAddressesByType(String userId, AddressType type) {
+        List<Address> addresses = addressRepository.findByUserIdAndTypeOrderByCreatedAtDesc(userId, type);
+        return addresses.stream()
+                .map(addressMapper::toDto)
+                .collect(java.util.stream.Collectors.toList());
+    }
+    
+    /**
+     * Get all addresses by type (admin only)
      */
     @Override
     @Transactional(readOnly = true)
     public List<AddressDto> getAddressesByType(AddressType type) {
         List<Address> addresses = addressRepository.findByType(type);
+        return addresses.stream()
+                .map(addressMapper::toDto)
+                .collect(java.util.stream.Collectors.toList());
+    }
+    
+    /**
+     * Get all addresses (admin only)
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<AddressDto> getAllAddresses() {
+        List<Address> addresses = addressRepository.findAll();
         return addresses.stream()
                 .map(addressMapper::toDto)
                 .collect(java.util.stream.Collectors.toList());
@@ -73,6 +121,22 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public Address createAddressEntity(AddressType type, String street, String city, String state, String zipCode, String country) {
         Address address = new Address();
+        address.setType(type);
+        address.setStreet(street);
+        address.setCity(city);
+        address.setState(state);
+        address.setZipCode(zipCode);
+        address.setCountry(country);
+        return address;
+    }
+    
+    /**
+     * Create address from individual components with user ID
+     */
+    @Override
+    public Address createAddressEntity(String userId, AddressType type, String street, String city, String state, String zipCode, String country) {
+        Address address = new Address();
+        address.setUserId(userId);
         address.setType(type);
         address.setStreet(street);
         address.setCity(city);

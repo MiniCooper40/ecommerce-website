@@ -18,15 +18,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import com.ecommerce.shared.testutil.WithMockUserPrincipal;
-
 import com.ecommerce.order.dto.AddressDto;
 import com.ecommerce.order.dto.CreateAddressRequest;
 import com.ecommerce.order.entity.Address;
 import com.ecommerce.order.entity.AddressType;
 import com.ecommerce.order.mapper.AddressMapper;
 import com.ecommerce.order.repository.AddressRepository;
-import com.ecommerce.order.service.AddressService;
+import com.ecommerce.shared.testutil.WithMockUserPrincipal;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -55,7 +53,7 @@ public class AddressServiceImplTest {
         when(addressRepository.save(any(Address.class))).thenReturn(sampleAddress);
 
         // Act
-        AddressDto result = addressService.createAddress(sampleCreateRequest);
+        AddressDto result = addressService.createAddress(sampleCreateRequest, "test-user");
 
         // Assert
         assertThat(result).isNotNull();
@@ -104,8 +102,6 @@ public class AddressServiceImplTest {
     @WithMockUserPrincipal(userId = "test-user", roles = {"USER"})
     public void testGetAddressesByType() {
         // Arrange
-        Address billingAddress = createSampleBillingAddress();
-        List<Address> addresses = Arrays.asList(sampleAddress, billingAddress);
         when(addressRepository.findByType(AddressType.SHIPPING)).thenReturn(Arrays.asList(sampleAddress));
 
         // Act
@@ -272,7 +268,7 @@ public class AddressServiceImplTest {
         when(addressRepository.save(any(Address.class))).thenReturn(sampleAddress);
 
         // Act
-        AddressDto result = addressService.createAddress(sampleCreateRequest);
+        AddressDto result = addressService.createAddress(sampleCreateRequest, "test-user");
 
         // Assert - The service should still work as it doesn't directly enforce security
         // Security is enforced at the controller level
@@ -283,25 +279,12 @@ public class AddressServiceImplTest {
     private Address createSampleAddress() {
         Address address = new Address();
         address.setId(1L);
+        address.setUserId("test-user");
         address.setType(AddressType.SHIPPING);
         address.setStreet("123 Main St");
         address.setCity("Anytown");
         address.setState("ST");
         address.setZipCode("12345");
-        address.setCountry("USA");
-        address.setCreatedAt(LocalDateTime.now());
-        address.setUpdatedAt(LocalDateTime.now());
-        return address;
-    }
-
-    private Address createSampleBillingAddress() {
-        Address address = new Address();
-        address.setId(2L);
-        address.setType(AddressType.BILLING);
-        address.setStreet("456 Oak Ave");
-        address.setCity("Somewhere");
-        address.setState("ST");
-        address.setZipCode("67890");
         address.setCountry("USA");
         address.setCreatedAt(LocalDateTime.now());
         address.setUpdatedAt(LocalDateTime.now());

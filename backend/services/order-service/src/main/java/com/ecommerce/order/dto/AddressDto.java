@@ -2,10 +2,11 @@ package com.ecommerce.order.dto;
 
 import java.time.LocalDateTime;
 
+import com.ecommerce.order.entity.AddressType;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.ecommerce.order.entity.AddressType;
 
 /**
  * DTO for Address responses
@@ -15,6 +16,7 @@ import com.ecommerce.order.entity.AddressType;
 @AllArgsConstructor
 public class AddressDto {
     private Long id;
+    private String userId;
     private AddressType type;
     private String street;
     private String city;

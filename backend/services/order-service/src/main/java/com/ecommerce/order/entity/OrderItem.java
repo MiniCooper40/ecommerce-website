@@ -37,6 +37,9 @@ public class OrderItem {
     @Column(name = "product_name", nullable = false)
     private String productName;
     
+    @Column(name = "product_image_url")
+    private String productImageUrl;
+    
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
     
@@ -44,10 +47,11 @@ public class OrderItem {
     private BigDecimal price;
 
     // Custom constructor with subtotal calculation
-    public OrderItem(Order order, Long productId, String productName, Integer quantity, BigDecimal price) {
+    public OrderItem(Order order, Long productId, String productName, String productImageUrl, Integer quantity, BigDecimal price) {
         this.order = order;
         this.productId = productId;
         this.productName = productName;
+        this.productImageUrl = productImageUrl;
         this.quantity = quantity;
         this.price = price;
     }

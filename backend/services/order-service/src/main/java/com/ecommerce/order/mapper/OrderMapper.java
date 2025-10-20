@@ -64,6 +64,7 @@ public class OrderMapper {
                 item.getId(),
                 item.getProductId(),
                 item.getProductName(),
+                item.getProductImageUrl(),
                 item.getQuantity(),
                 item.getPrice(),
                 item.getSubtotal()

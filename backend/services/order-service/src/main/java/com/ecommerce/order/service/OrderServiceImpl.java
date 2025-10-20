@@ -62,9 +62,11 @@ public class OrderServiceImpl implements OrderService {
     public OrderDto createOrder(CreateOrderRequest request, String userId) {
         // Create addresses first
         Address shippingAddress = addressService.convertToEntity(request.getShippingAddress());
+        shippingAddress.setUserId(userId);
         shippingAddress.setType(AddressType.SHIPPING);
         
         Address billingAddress = addressService.convertToEntity(request.getBillingAddress());
+        billingAddress.setUserId(userId);
         billingAddress.setType(AddressType.BILLING);
         
         // Create the order

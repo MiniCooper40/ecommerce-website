@@ -34,6 +34,9 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @Column(name = "user_id", nullable = false)
+    private String userId;
+    
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
     private AddressType type;
@@ -62,7 +65,8 @@ public class Address {
     private LocalDateTime updatedAt;
 
     // Custom constructor for common use case
-    public Address(AddressType type, String street, String city, String state, String zipCode, String country) {
+    public Address(String userId, AddressType type, String street, String city, String state, String zipCode, String country) {
+        this.userId = userId;
         this.type = type;
         this.street = street;
         this.city = city;

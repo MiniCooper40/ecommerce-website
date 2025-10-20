@@ -25,6 +25,7 @@ public class AddressMapper {
         
         return new AddressDto(
                 address.getId(),
+                address.getUserId(),
                 address.getType(),
                 address.getStreet(),
                 address.getCity(),
