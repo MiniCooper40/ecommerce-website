@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.ecommerce.security.entity.Role;
 import com.ecommerce.security.entity.User;
 
 import io.jsonwebtoken.Claims;
@@ -66,8 +67,9 @@ public class JwtUtil {
         Date now = new Date(nowTime);
         Date expiryDate = new Date(nowTime + jwtExpiration);
 
-        List<String> roles = user.getRoles().stream()
-                .map(role -> role.getName().name())
+        // Extract raw role names for Spring's standard scope claim
+        List<String> scopes = user.getRoles().stream()
+                .map(Role::toString)
                 .collect(Collectors.toList());
 
         // Generate unique JWT ID to ensure token uniqueness
@@ -78,7 +80,7 @@ public class JwtUtil {
                 .claim("email", user.getEmail())
                 .claim("firstName", user.getFirstName())
                 .claim("lastName", user.getLastName())
-                .claim("roles", roles)
+                .claim("scope", String.join(" ", scopes))  // Space-separated as per OAuth2/OpenID standards
                 .id(jwtId)  // Add unique JWT ID
                 .issuedAt(now)
                 .expiration(expiryDate)
@@ -180,7 +182,8 @@ public class JwtUtil {
                     .claim("email", claims.get("email"))
                     .claim("firstName", claims.get("firstName"))
                     .claim("lastName", claims.get("lastName"))
-                    .claim("roles", claims.get("roles"))
+                    .claim("scope", claims.get("scope"))  // Preserve scope claim
+                    .claim("roles", claims.get("roles"))  // Keep legacy roles for backward compatibility
                     .id(newJwtId)  // Add unique JWT ID
                     .issuedAt(newIat)
                     .expiration(expiryDate)

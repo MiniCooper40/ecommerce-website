@@ -17,16 +17,19 @@ public class WithMockUserPrincipalSecurityContextFactory
 
     @Override
     public SecurityContext createSecurityContext(WithMockUserPrincipal annotation) {
-        // Map roles -> authorities
+        // Map roles -> authorities using SCOPE_ prefix (Spring JWT default)
         List<GrantedAuthority> authorities = Arrays.stream(annotation.roles())
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                .map(role -> new SimpleGrantedAuthority("SCOPE_" + role))
                 .collect(Collectors.toList());
+
+        // Create space-separated scope string for the scope claim (Spring JWT standard)
+        String scopeClaim = String.join(" ", annotation.roles());
 
         // Build a fake JWT (token value doesn't matter)
         Jwt jwt = Jwt.withTokenValue("mock-token")
                 .header("alg", "none")
                 .claim("sub", annotation.userId())
-                .claim("roles", Arrays.asList(annotation.roles()))
+                .claim("scope", scopeClaim)  // Spring's default claim for authorities
                 .build();
 
         // Create a JwtAuthenticationToken so Spring Security treats it like a real JWT-auth user

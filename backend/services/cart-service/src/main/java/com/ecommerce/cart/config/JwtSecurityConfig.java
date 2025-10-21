@@ -1,20 +1,12 @@
 package com.ecommerce.cart.config;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
@@ -22,7 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
  * 
  * This configuration:
  * - Validates JWTs using the security-service JWK endpoint
- * - Extracts user roles from JWT claims
+ * - Uses Spring Security's default JWT converter (handles SCOPE_ prefixed authorities)
  * - Provides stateless authentication
  * - Protects cart endpoints requiring user authentication
  */
@@ -41,42 +33,15 @@ public class JwtSecurityConfig {
                 .requestMatchers("/actuator/**", "/health/**", "/info/**").permitAll()
                 // Cart operations require authentication (users can only access their own carts)
                 .requestMatchers("/api/cart/**").authenticated()
-                // Admin endpoints require ADMIN role
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                // Admin endpoints require ADMIN authority (using SCOPE_ prefix)
+                .requestMatchers("/api/admin/**").hasAuthority("SCOPE_ADMIN")
                 // All other endpoints require authentication
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(jwt -> jwt
-                    .jwtAuthenticationConverter(jwtAuthenticationConverter())
-                )
+                .jwt(Customizer.withDefaults())
             );
 
         return http.build();
-    }
-
-    @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter());
-        return converter;
-    }
-
-    @Bean
-    public Converter<Jwt, Collection<GrantedAuthority>> jwtGrantedAuthoritiesConverter() {
-        return new Converter<Jwt, Collection<GrantedAuthority>>() {
-            @Override
-            public Collection<GrantedAuthority> convert(Jwt jwt) {
-                // Extract roles from the JWT 'roles' claim
-                List<String> roles = jwt.getClaimAsStringList("roles");
-                if (roles == null) {
-                    return List.of();
-                }
-                
-                return roles.stream()
-                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                    .collect(Collectors.toList());
-            }
-        };
     }
 }
