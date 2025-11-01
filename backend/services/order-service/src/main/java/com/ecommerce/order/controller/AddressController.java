@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,20 +52,17 @@ public class AddressController {
     }
 
     @GetMapping("/admin/all")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<AddressDto>> getAllAddresses() {
         // Get all addresses regardless of type - need a new service method
         return ResponseEntity.ok(addressService.getAllAddresses());
     }
     
     @GetMapping("/admin/by-type")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<AddressDto>> getAllAddressesByType(@RequestParam AddressType type) {
         return ResponseEntity.ok(addressService.getAddressesByType(type));
     }
     
     @GetMapping("/admin/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AddressDto> getAnyAddress(@PathVariable Long id) {
         return ResponseEntity.ok(addressService.getAddress(id));
     }

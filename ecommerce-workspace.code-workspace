@@ -1,114 +1,118 @@
 {
-	"folders": [
-		{
-			"name": "Frontend",
-			"path": "./frontend"
-		},
-		{
-			"name": "Cart Service",
-			"path": "./backend/services/cart-service"
-		},
-		{
-			"name": "Catalog Service", 
-			"path": "./backend/services/catalog-service"
-		},
-		{
-			"name": "Eureka Server",
-			"path": "./backend/services/eureka-server"
-		},
-		{
-			"name": "Gateway",
-			"path": "./backend/services/gateway"
-		},
-		{
-			"name": "Order Service",
-			"path": "./backend/services/order-service"
-		},
-		{
-			"name": "Security Service",
-			"path": "./backend/services/security-service"
-		},
-		{
-			"name": "Test Utils (Shared)",
-			"path": "./backend/shared/test-utils"
-		},
-		{
-			"name": "Root",
-			"path": "."
-		}
-	],
-	"settings": {
-		"java.configuration.updateBuildConfiguration": "automatic",
-		"java.import.maven.enabled": true,
-		"java.import.gradle.enabled": false,
-		"java.saveActions.organizeImports": true,
-		"java.compile.nullAnalysis.mode": "automatic",
-		"java.configuration.workspaceCacheLimit": 90,
-		"java.sources.organizeImports.starThreshold": 99,
-		"java.sources.organizeImports.staticStarThreshold": 99,
-		"java.project.sourcePaths": [],
-		"java.project.referencedLibraries": [],
-		"files.exclude": {
-			"**/target": true,
-			"**/.classpath": true,
-			"**/.project": true,
-			"**/.settings": true,
-			"**/.factorypath": true
-		},
-		"java.configuration.runtimes": [],
-		"maven.executable.path": "mvn",
-		"maven.terminal.useJavaHome": true,
-		"maven.terminal.customEnv": []
-	},
-	"extensions": {
-		"recommendations": [
-			"vscjava.vscode-java-pack",
-			"vscjava.vscode-maven",
-			"redhat.java",
-			"vscjava.vscode-java-dependency",
-			"vscjava.vscode-java-test",
-			"vscjava.vscode-java-debug"
-		]
-	},
-	"launch": {
-		"version": "0.2.0",
-		"configurations": []
-	},
-	"tasks": {
-		"version": "2.0.0",
-		"tasks": [
-			{
-				"label": "Maven: Clean All Services",
-				"type": "shell",
-				"command": "mvn",
-				"args": ["clean"],
-				"options": {
-					"cwd": "${workspaceFolder}/backend"
-				},
-				"group": "build",
-				"presentation": {
-					"echo": true,
-					"reveal": "always",
-					"focus": false,
-					"panel": "shared"
-				}
-			},
-			{
-				"label": "Maven: Install All Services",
-				"type": "shell", 
-				"command": "mvn",
-				"args": ["install"],
-				"options": {
-					"cwd": "${workspaceFolder}/backend"
-				},
-				"group": "build",
-				"presentation": {
-					"echo": true,
-					"reveal": "always",
-					"focus": false,
-					"panel": "shared"
-				}
-			}
-		]
-	}
+  "folders": [
+    {
+      "name": "Frontend",
+      "path": "./frontend"
+    },
+    {
+      "name": "Cart Service",
+      "path": "./backend/services/cart-service"
+    },
+    {
+      "name": "Catalog Service",
+      "path": "./backend/services/catalog-service"
+    },
+    {
+      "name": "Eureka Server",
+      "path": "./backend/services/eureka-server"
+    },
+    {
+      "name": "Gateway",
+      "path": "./backend/services/gateway"
+    },
+    {
+      "name": "Order Service",
+      "path": "./backend/services/order-service"
+    },
+    {
+      "name": "Security Service",
+      "path": "./backend/services/security-service"
+    },
+    {
+      "name": "Test Utils (Shared)",
+      "path": "./backend/shared/test-utils"
+    },
+    {
+      "name": "Security Library (Shared)",
+      "path": "./backend/shared/security-lib"
+    },
+    {
+      "name": "Root",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.import.maven.enabled": true,
+    "java.import.gradle.enabled": false,
+    "java.saveActions.organizeImports": true,
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.configuration.workspaceCacheLimit": 90,
+    "java.sources.organizeImports.starThreshold": 99,
+    "java.sources.organizeImports.staticStarThreshold": 99,
+    "java.project.sourcePaths": [],
+    "java.project.referencedLibraries": [],
+    "files.exclude": {
+      "**/target": true,
+      "**/.classpath": true,
+      "**/.project": true,
+      "**/.settings": true,
+      "**/.factorypath": true
+    },
+    "java.configuration.runtimes": [],
+    "maven.executable.path": "mvn",
+    "maven.terminal.useJavaHome": true,
+    "maven.terminal.customEnv": []
+  },
+  "extensions": {
+    "recommendations": [
+      "vscjava.vscode-java-pack",
+      "vscjava.vscode-maven",
+      "redhat.java",
+      "vscjava.vscode-java-dependency",
+      "vscjava.vscode-java-test",
+      "vscjava.vscode-java-debug"
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": []
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Maven: Clean All Services",
+        "type": "shell",
+        "command": "mvn",
+        "args": ["clean"],
+        "options": {
+          "cwd": "${workspaceFolder}/backend"
+        },
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        }
+      },
+      {
+        "label": "Maven: Install All Services",
+        "type": "shell",
+        "command": "mvn",
+        "args": ["install"],
+        "options": {
+          "cwd": "${workspaceFolder}/backend"
+        },
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        }
+      }
+    ]
+  }
 }

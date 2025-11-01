@@ -29,6 +29,7 @@
         <module>services/order-service</module>
         <module>services/security-service</module>
         <module>shared/test-utils</module>
+        <module>shared/security-lib</module>
     </modules>
 
     <dependencyManagement>
@@ -53,6 +54,12 @@
                 <artifactId>test-utils</artifactId>
                 <version>${project.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <!-- Shared security library -->
+            <dependency>
+                <groupId>com.ecommerce</groupId>
+                <artifactId>security-lib</artifactId>
+                <version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

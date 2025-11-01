@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.catalog.dto.ProductDto;
 import com.ecommerce.catalog.service.ProductService;
+import com.ecommerce.security.annotation.IsAdminUser;
 
 import jakarta.validation.Valid;
 
@@ -51,21 +51,21 @@ public class ProductController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsAdminUser
     public ResponseEntity<ProductDto> createProduct(@Valid @RequestBody ProductDto productDto) {
         // Only admins can create products
         return ResponseEntity.ok(productService.createProduct(productDto));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsAdminUser
     public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductDto productDto) {
         // Only admins can update products
         return ResponseEntity.ok(productService.updateProduct(id, productDto));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsAdminUser
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         // Only admins can delete products
         productService.deleteProduct(id);
@@ -119,7 +119,6 @@ public class ProductController {
     // Admin endpoints for inventory management
 
     @GetMapping("/admin/low-stock")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ProductDto>> getLowStockProducts(
             @RequestParam(defaultValue = "10") Integer threshold) {
         // Admin only - get products with low stock
@@ -127,7 +126,6 @@ public class ProductController {
     }
 
     @PutMapping("/admin/{id}/stock")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductDto> updateStock(
             @PathVariable Long id,
             @RequestParam Integer stockQuantity) {
@@ -136,7 +134,6 @@ public class ProductController {
     }
 
     @GetMapping("/admin/{id}/availability")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Boolean> checkProductAvailability(
             @PathVariable Long id,
             @RequestParam Integer quantity) {

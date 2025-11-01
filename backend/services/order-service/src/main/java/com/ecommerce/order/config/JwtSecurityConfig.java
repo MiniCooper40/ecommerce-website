@@ -31,10 +31,11 @@ public class JwtSecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 // Public endpoints
                 .requestMatchers("/actuator/**", "/health/**", "/info/**").permitAll()
+                // Admin endpoints require ADMIN authority (using SCOPE_ prefix)
+                .requestMatchers("/api/orders/admin/**").hasAuthority("SCOPE_ADMIN")
+                .requestMatchers("/api/addresses/admin/**").hasAuthority("SCOPE_ADMIN")
                 // Order operations require authentication (users can only access their own orders)
                 .requestMatchers("/api/orders/**").authenticated()
-                // Admin endpoints require ADMIN authority (using SCOPE_ prefix)
-                .requestMatchers("/api/admin/**").hasAuthority("SCOPE_ADMIN")
                 // All other endpoints require authentication
                 .anyRequest().authenticated()
             )
