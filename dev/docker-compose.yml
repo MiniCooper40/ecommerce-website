@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  # MinIO S3 Compatible Storage
+  minio:
+    image: minio/minio:latest
+    container_name: ecommerce-minio
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # MinIO Console
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - ecommerce-network
+
+  # MinIO Client - Creates bucket and sets policy
+  minio-setup:
+    image: minio/mc:latest
+    container_name: ecommerce-minio-setup
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      echo 'Waiting for MinIO to be ready...';
+      sleep 10;
+      mc alias set myminio http://minio:9000 minioadmin minioadmin;
+      echo 'Creating bucket if it does not exist...';
+      mc mb myminio/ecommerce-images --ignore-existing;
+      echo 'Setting bucket policy to public...';
+      mc anonymous set public myminio/ecommerce-images;
+      echo 'MinIO setup complete!';
+      "
+    networks:
+      - ecommerce-network
+
+  # PostgreSQL Database (alternative to H2 for more realistic dev environment)
+  postgres:
+    image: postgres:15-alpine
+    container_name: ecommerce-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ecommerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - ecommerce-network
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: ecommerce-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - ecommerce-network
+
+volumes:
+  minio_data:
+    name: ecommerce_minio_data
+  postgres_data:
+    name: ecommerce_postgres_data
+  redis_data:
+    name: ecommerce_redis_data
+
+networks:
+  ecommerce-network:
+    name: ecommerce-network
+    driver: bridge

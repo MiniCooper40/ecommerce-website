@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.ecommerce.catalog.dto.CreateProductRequest;
 import com.ecommerce.catalog.dto.ProductDto;
 
 /**
@@ -32,6 +33,11 @@ public interface ProductService {
      * Create new product (Admin only)
      */
     ProductDto createProduct(ProductDto productDto);
+
+    /**
+     * Create new product with images (Admin only)
+     */
+    ProductDto createProduct(CreateProductRequest createRequest);
 
     /**
      * Update product (Admin only)

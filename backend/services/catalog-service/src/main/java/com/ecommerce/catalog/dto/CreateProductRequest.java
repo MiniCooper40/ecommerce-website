@@ -1,7 +1,6 @@
 package com.ecommerce.catalog.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.validation.Valid;
@@ -16,9 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductDto {
-    
-    private Long id;
+public class CreateProductRequest {
     
     @NotBlank(message = "Product name is required")
     private String name;
@@ -35,7 +32,7 @@ public class ProductDto {
     private String brand;
     
     @Valid
-    private List<ImageDto> images;
+    private List<CreateImageRequest> images;
     
     @Min(value = 0, message = "Stock quantity cannot be negative")
     private Integer stockQuantity;
@@ -47,7 +44,4 @@ public class ProductDto {
     private String dimensions;
     
     private Boolean isActive;
-    
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }

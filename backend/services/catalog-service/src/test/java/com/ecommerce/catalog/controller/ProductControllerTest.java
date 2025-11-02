@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
@@ -106,7 +107,8 @@ public class ProductControllerTest {
         product.setCategory("Electronics");
         product.setBrand("TestBrand");
         product.setStockQuantity(5);
-        product.setImageUrl("http://example.com/image.jpg");
+        // Images will be empty list for this test
+        product.setImages(new ArrayList<>());
         return product;
     }
 }

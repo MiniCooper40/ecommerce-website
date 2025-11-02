@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ecommerce.catalog.dto.CreateProductRequest;
 import com.ecommerce.catalog.dto.ProductDto;
 import com.ecommerce.catalog.service.ProductService;
 import com.ecommerce.security.annotation.IsAdmin;
@@ -55,6 +56,13 @@ public class ProductController {
     public ResponseEntity<ProductDto> createProduct(@Valid @RequestBody ProductDto productDto) {
         // Only admins can create products
         return ResponseEntity.ok(productService.createProduct(productDto));
+    }
+
+    @PostMapping("/with-images")
+    @IsAdmin
+    public ResponseEntity<ProductDto> createProductWithImages(@Valid @RequestBody CreateProductRequest createRequest) {
+        // Only admins can create products with images
+        return ResponseEntity.ok(productService.createProduct(createRequest));
     }
 
     @PutMapping("/{id}")

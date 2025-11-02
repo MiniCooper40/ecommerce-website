@@ -31,6 +31,15 @@ spring:
         jwt:
           jwk-set-uri: http://localhost:8081/.well-known/jwks.json
 
+# AWS S3 Configuration
+aws:
+  s3:
+    endpoint: ${S3_ENDPOINT:http://localhost:9000}  # MinIO endpoint for local dev
+    region: ${AWS_REGION:us-east-1}
+    access-key: ${AWS_ACCESS_KEY:minioadmin}
+    secret-key: ${AWS_SECRET_KEY:minioadmin}
+    bucket: ${S3_BUCKET:ecommerce-images}
+
 management:
   endpoints:
     web:
@@ -67,6 +76,15 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: http://security-service:8081/.well-known/jwks.json
+
+# AWS S3 Configuration for Docker
+aws:
+  s3:
+    endpoint: ${S3_ENDPOINT:http://minio:9000}  # MinIO endpoint for Docker
+    region: ${AWS_REGION:us-east-1}
+    access-key: ${AWS_ACCESS_KEY:minioadmin}
+    secret-key: ${AWS_SECRET_KEY:minioadmin}
+    bucket: ${S3_BUCKET:ecommerce-images}
 
 eureka:
   client:

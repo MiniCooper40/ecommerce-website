@@ -2,17 +2,24 @@ package com.ecommerce.catalog.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
@@ -55,8 +62,10 @@ public class Product {
     @Column(name = "brand")
     private String brand;
 
-    @Column(name = "image_url")
-    private String imageUrl;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OrderBy("displayOrder ASC, id ASC")
+    @Builder.Default
+    private List<Image> images = new ArrayList<>();
 
     @Builder.Default
     @Min(value = 0, message = "Stock quantity cannot be negative")
@@ -105,5 +114,42 @@ public class Product {
         if (quantity != null && quantity > 0) {
             this.stockQuantity = (stockQuantity != null ? stockQuantity : 0) + quantity;
         }
+    }
+
+    // Image management methods
+    public void addImage(Image image) {
+        if (image != null) {
+            image.setProduct(this);
+            this.images.add(image);
+        }
+    }
+
+    public void removeImage(Image image) {
+        if (image != null) {
+            this.images.remove(image);
+            image.setProduct(null);
+        }
+    }
+
+    public void clearImages() {
+        this.images.forEach(image -> image.setProduct(null));
+        this.images.clear();
+    }
+
+    public Optional<Image> getPrimaryImage() {
+        return images.stream()
+                .filter(Image::isAvailable)
+                .filter(Image::getIsPrimary)
+                .findFirst();
+    }
+
+    public List<Image> getActiveImages() {
+        return images.stream()
+                .filter(Image::isAvailable)
+                .toList();
+    }
+
+    public boolean hasImages() {
+        return !images.isEmpty() && images.stream().anyMatch(Image::isAvailable);
     }
 }

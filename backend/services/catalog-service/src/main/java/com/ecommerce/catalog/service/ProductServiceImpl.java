@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ecommerce.catalog.dto.CreateProductRequest;
+import com.ecommerce.catalog.dto.ImageDto;
 import com.ecommerce.catalog.dto.ProductDto;
 import com.ecommerce.catalog.entity.Product;
 import com.ecommerce.catalog.repository.ProductRepository;
@@ -22,6 +24,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private ImageService imageService;
 
     // Get all products with pagination
     @Override
@@ -70,6 +75,32 @@ public class ProductServiceImpl implements ProductService {
         
         product = productRepository.save(product);
         return convertToDto(product);
+    }
+
+    // Create new product with images (Admin only)
+    @Override
+    public ProductDto createProduct(CreateProductRequest createRequest) {
+        // Check if SKU already exists
+        if (createRequest.getSku() != null && productRepository.existsBySku(createRequest.getSku())) {
+            throw new RuntimeException("Product with SKU '" + createRequest.getSku() + "' already exists");
+        }
+
+        Product product = convertToEntity(createRequest);
+        product.setCreatedAt(LocalDateTime.now());
+        product.setUpdatedAt(LocalDateTime.now());
+        
+        Product savedProduct = productRepository.save(product);
+
+        // Create images if provided
+        if (createRequest.getImages() != null && !createRequest.getImages().isEmpty()) {
+            createRequest.getImages().forEach(imageRequest -> {
+                imageService.createImage(savedProduct, imageRequest);
+            });
+        }
+
+        // Reload product with images
+        Product reloadedProduct = productRepository.findById(savedProduct.getId()).orElse(savedProduct);
+        return convertToDto(reloadedProduct);
     }
 
     // Update product (Admin only)
@@ -204,7 +235,11 @@ public class ProductServiceImpl implements ProductService {
         dto.setPrice(product.getPrice());
         dto.setCategory(product.getCategory());
         dto.setBrand(product.getBrand());
-        dto.setImageUrl(product.getImageUrl());
+        
+        // Convert images
+        List<ImageDto> imageDtos = imageService.getImagesByProductId(product.getId());
+        dto.setImages(imageDtos);
+        
         dto.setStockQuantity(product.getStockQuantity());
         dto.setSku(product.getSku());
         dto.setWeight(product.getWeight());
@@ -223,7 +258,22 @@ public class ProductServiceImpl implements ProductService {
         product.setPrice(dto.getPrice());
         product.setCategory(dto.getCategory());
         product.setBrand(dto.getBrand());
-        product.setImageUrl(dto.getImageUrl());
+        product.setStockQuantity(dto.getStockQuantity() != null ? dto.getStockQuantity() : 0);
+        product.setSku(dto.getSku());
+        product.setWeight(dto.getWeight());
+        product.setDimensions(dto.getDimensions());
+        product.setIsActive(dto.getIsActive() != null ? dto.getIsActive() : true);
+        return product;
+    }
+
+    // Convert CreateProductRequest to Entity
+    private Product convertToEntity(CreateProductRequest dto) {
+        Product product = new Product();
+        product.setName(dto.getName());
+        product.setDescription(dto.getDescription());
+        product.setPrice(dto.getPrice());
+        product.setCategory(dto.getCategory());
+        product.setBrand(dto.getBrand());
         product.setStockQuantity(dto.getStockQuantity() != null ? dto.getStockQuantity() : 0);
         product.setSku(dto.getSku());
         product.setWeight(dto.getWeight());
@@ -239,11 +289,11 @@ public class ProductServiceImpl implements ProductService {
         if (dto.getPrice() != null) product.setPrice(dto.getPrice());
         if (dto.getCategory() != null) product.setCategory(dto.getCategory());
         if (dto.getBrand() != null) product.setBrand(dto.getBrand());
-        if (dto.getImageUrl() != null) product.setImageUrl(dto.getImageUrl());
         if (dto.getStockQuantity() != null) product.setStockQuantity(dto.getStockQuantity());
         if (dto.getSku() != null) product.setSku(dto.getSku());
         if (dto.getWeight() != null) product.setWeight(dto.getWeight());
         if (dto.getDimensions() != null) product.setDimensions(dto.getDimensions());
         if (dto.getIsActive() != null) product.setIsActive(dto.getIsActive());
+        // Note: Image updates should be handled separately through ImageService
     }
 }

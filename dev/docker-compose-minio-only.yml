@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # MinIO S3 Compatible Storage
+  minio:
+    image: minio/minio:latest
+    container_name: ecommerce-minio
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # MinIO Console
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # MinIO Client - Creates bucket and sets policy
+  minio-setup:
+    image: minio/mc:latest
+    container_name: ecommerce-minio-setup
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      echo 'Waiting for MinIO to be ready...';
+      sleep 10;
+      mc alias set myminio http://minio:9000 minioadmin minioadmin;
+      echo 'Creating bucket if it does not exist...';
+      mc mb myminio/ecommerce-images --ignore-existing;
+      echo 'Setting bucket policy to public...';
+      mc anonymous set public myminio/ecommerce-images;
+      echo 'MinIO setup complete!';
+      "
+
+volumes:
+  minio_data:
+    name: ecommerce_minio_data
