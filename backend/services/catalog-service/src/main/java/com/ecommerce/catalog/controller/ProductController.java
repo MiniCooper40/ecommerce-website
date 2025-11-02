@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.catalog.dto.ProductDto;
 import com.ecommerce.catalog.service.ProductService;
-import com.ecommerce.security.annotation.IsAdminUser;
+import com.ecommerce.security.annotation.IsAdmin;
 
 import jakarta.validation.Valid;
 
@@ -51,21 +51,21 @@ public class ProductController {
     }
 
     @PostMapping
-    @IsAdminUser
+    @IsAdmin
     public ResponseEntity<ProductDto> createProduct(@Valid @RequestBody ProductDto productDto) {
         // Only admins can create products
         return ResponseEntity.ok(productService.createProduct(productDto));
     }
 
     @PutMapping("/{id}")
-    @IsAdminUser
+    @IsAdmin
     public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductDto productDto) {
         // Only admins can update products
         return ResponseEntity.ok(productService.updateProduct(id, productDto));
     }
 
     @DeleteMapping("/{id}")
-    @IsAdminUser
+    @IsAdmin
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         // Only admins can delete products
         productService.deleteProduct(id);
