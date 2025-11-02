@@ -37,6 +37,10 @@
       "path": "./backend/shared/security-lib"
     },
     {
+      "name": "Events Library (Shared)",
+      "path": "./backend/shared/events-lib"
+    },
+    {
       "name": "Root",
       "path": "."
     }

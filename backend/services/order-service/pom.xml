@@ -98,6 +98,12 @@
             <groupId>com.ecommerce</groupId>
             <artifactId>security-lib</artifactId>
         </dependency>
+        
+        <!-- Events Library -->
+        <dependency>
+            <groupId>com.ecommerce</groupId>
+            <artifactId>events-lib</artifactId>
+        </dependency>
     </dependencies>
     
     <build>

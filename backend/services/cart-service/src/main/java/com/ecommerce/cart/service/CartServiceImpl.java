@@ -1,5 +1,6 @@
 package com.ecommerce.cart.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -101,6 +102,19 @@ public class CartServiceImpl implements CartService {
     public Integer getCartItemCount(String userId) {
         Integer count = cartItemRepository.sumQuantityByUserId(userId);
         return count != null ? count : 0;
+    }
+
+    @Override
+    public void updateCartItemsForProduct(Long productId, String productName, BigDecimal productPrice, String productImageUrl) {
+        List<CartItem> cartItems = cartItemRepository.findByProductId(productId);
+        
+        for (CartItem cartItem : cartItems) {
+            cartItem.setProductName(productName);
+            cartItem.setProductPrice(productPrice);
+            cartItem.setProductImageUrl(productImageUrl);
+        }
+        
+        cartItemRepository.saveAll(cartItems);
     }
 
     private CartItemDto convertToDto(CartItem cartItem) {

@@ -30,4 +30,6 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
     Integer sumQuantityByUserId(@Param("userId") String userId);
     
     boolean existsByUserIdAndProductId(String userId, Long productId);
+    
+    List<CartItem> findByProductId(Long productId);
 }

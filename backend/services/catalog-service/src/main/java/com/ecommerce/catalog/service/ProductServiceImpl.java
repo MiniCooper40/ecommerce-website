@@ -17,7 +17,13 @@ import com.ecommerce.catalog.dto.ImageDto;
 import com.ecommerce.catalog.dto.ProductDto;
 import com.ecommerce.catalog.entity.Product;
 import com.ecommerce.catalog.repository.ProductRepository;
+import com.ecommerce.shared.events.EventPublisher;
+import com.ecommerce.shared.events.domain.ProductUpdatedEvent;
+import com.ecommerce.shared.events.util.EventCorrelationUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 @Transactional
 public class ProductServiceImpl implements ProductService {
@@ -27,6 +33,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ImageService imageService;
+
+    @Autowired
+    private EventPublisher eventPublisher;
 
     // Get all products with pagination
     @Override
@@ -121,6 +130,10 @@ public class ProductServiceImpl implements ProductService {
         existingProduct.setUpdatedAt(LocalDateTime.now());
         
         existingProduct = productRepository.save(existingProduct);
+        
+        // Publish ProductUpdatedEvent
+        publishProductUpdatedEvent(existingProduct);
+        
         return convertToDto(existingProduct);
     }
 
@@ -209,6 +222,10 @@ public class ProductServiceImpl implements ProductService {
         product.setUpdatedAt(LocalDateTime.now());
         
         product = productRepository.save(product);
+        
+        // Publish ProductUpdatedEvent for stock changes
+        publishProductUpdatedEvent(product);
+        
         return convertToDto(product);
     }
 
@@ -295,5 +312,40 @@ public class ProductServiceImpl implements ProductService {
         if (dto.getDimensions() != null) product.setDimensions(dto.getDimensions());
         if (dto.getIsActive() != null) product.setIsActive(dto.getIsActive());
         // Note: Image updates should be handled separately through ImageService
+    }
+
+    /**
+     * Publishes a ProductUpdatedEvent for the given product
+     */
+    private void publishProductUpdatedEvent(Product product) {
+        try {
+            // Get primary image URL if available
+            String imageUrl = product.getPrimaryImage()
+                    .map(image -> image.getUrl())
+                    .orElse(null);
+
+            ProductUpdatedEvent event = ProductUpdatedEvent.builder()
+                    .productId(product.getId().toString())
+                    .name(product.getName())
+                    .description(product.getDescription())
+                    .price(product.getPrice())
+                    .currency("USD") // Default currency, could be configurable
+                    .stockQuantity(product.getStockQuantity())
+                    .category(product.getCategory())
+                    .imageUrl(imageUrl)
+                    .active(product.getIsActive())
+                    .source("catalog-service")
+                    .correlationId(EventCorrelationUtils.getOrCreateCorrelationId())
+                    .build();
+
+            eventPublisher.publish(event);
+            
+            log.info("Published ProductUpdatedEvent for product ID: {} with correlation ID: {}", 
+                    product.getId(), event.getCorrelationId());
+                    
+        } catch (Exception e) {
+            log.error("Failed to publish ProductUpdatedEvent for product ID: {}", product.getId(), e);
+            // Don't rethrow the exception to avoid breaking the main operation
+        }
     }
 }

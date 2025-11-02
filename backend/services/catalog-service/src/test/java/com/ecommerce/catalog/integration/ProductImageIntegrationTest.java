@@ -10,8 +10,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ecommerce.catalog.dto.CreateImageRequest;
@@ -19,11 +17,10 @@ import com.ecommerce.catalog.dto.CreateProductRequest;
 import com.ecommerce.catalog.dto.ImageDto;
 import com.ecommerce.catalog.dto.ProductDto;
 import com.ecommerce.catalog.service.ProductService;
+import com.ecommerce.shared.testutil.BaseTest;
 
-@SpringBootTest
-@ActiveProfiles("test")
 @Transactional
-public class ProductImageIntegrationTest {
+public class ProductImageIntegrationTest extends BaseTest {
 
     @Autowired
     private ProductService productService;

@@ -14,7 +14,6 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -25,12 +24,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.ecommerce.catalog.dto.ProductDto;
 import com.ecommerce.catalog.service.ProductService;
+import com.ecommerce.shared.testutil.BaseTest;
 import com.ecommerce.shared.testutil.WithMockUserPrincipal;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@SpringBootTest
 @AutoConfigureMockMvc
-public class ProductControllerTest {
+public class ProductControllerTest extends BaseTest {
 
     @Autowired
     private MockMvc mockMvc;

@@ -42,4 +42,9 @@ public interface CartService {
      * Get total item count in cart
      */
     Integer getCartItemCount(String userId);
+    
+    /**
+     * Update cart items for a specific product
+     */
+    void updateCartItemsForProduct(Long productId, String productName, java.math.BigDecimal productPrice, String productImageUrl);
 }

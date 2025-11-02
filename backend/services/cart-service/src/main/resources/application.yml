@@ -44,6 +44,15 @@ spring:
         jwt:
           jwk-set-uri: http://localhost:8081/.well-known/jwks.json
 
+# Events Configuration
+ecommerce:
+  events:
+    bootstrap-servers: localhost:9092
+    topics:
+      product-events: product-events
+      cart-events: cart-events
+      order-events: order-events
+
 management:
   endpoints:
     web:
@@ -85,6 +94,15 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: http://security-service:8081/.well-known/jwks.json
+
+# Events Configuration for Docker
+ecommerce:
+  events:
+    bootstrap-servers: kafka:9093
+    topics:
+      product-events: product-events
+      cart-events: cart-events
+      order-events: order-events
 
 eureka:
   client:

@@ -1,0 +1,52 @@
+# Kafka Events Configuration Example
+# Add these properties to your application.yml or application.properties
+
+ecommerce:
+  events:
+    bootstrap-servers: localhost:9092
+    topics:
+      order-events: order-events
+      cart-events: cart-events
+      product-events: product-events
+      user-events: user-events
+      payment-events: payment-events
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      retries: 3
+      acks: all
+      batch-size: 16384
+      linger-ms: 5
+      buffer-memory: 33554432
+      enable-idempotence: true
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      isolation-level: read_committed
+      max-poll-records: 500
+      session-timeout-ms: 30000
+      heartbeat-interval-ms: 3000
+
+# Optional: Override default configurations per environment
+---
+spring:
+  profiles: docker
+
+ecommerce:
+  events:
+    bootstrap-servers: kafka:9093
+
+---
+spring:
+  profiles: production
+
+ecommerce:
+  events:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      retries: 10
+      acks: all
+    consumer:
+      session-timeout-ms: 45000
