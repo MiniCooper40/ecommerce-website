@@ -8,6 +8,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 /**
  * JWT Security Configuration for Catalog Service.
@@ -24,16 +26,22 @@ import org.springframework.security.web.SecurityFilterChain;
 public class JwtSecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
+        MvcRequestMatcher.Builder mvcMatcherBuilder = new MvcRequestMatcher.Builder(introspector);
+        
         http
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
                 // Public endpoints - allow anyone to view products
-                .requestMatchers("/actuator/**", "/health/**", "/info/**").permitAll()
-                .requestMatchers("/api/products/**").permitAll() // Allow public product browsing
+                .requestMatchers(
+                    mvcMatcherBuilder.pattern("/actuator/**"),
+                    mvcMatcherBuilder.pattern("/health/**"),
+                    mvcMatcherBuilder.pattern("/info/**")
+                ).permitAll()
+                .requestMatchers(mvcMatcherBuilder.pattern("/catalog/products/**")).permitAll() // Allow public product browsing
                 // Admin endpoints require ADMIN authority (using SCOPE_ prefix)
-                .requestMatchers("/api/products/admin/**").hasAuthority("SCOPE_ADMIN")
+                .requestMatchers(mvcMatcherBuilder.pattern("/catalog/products/admin/**")).hasAuthority("SCOPE_ADMIN")
                 // All other endpoints require authentication
                 .anyRequest().authenticated()
             )

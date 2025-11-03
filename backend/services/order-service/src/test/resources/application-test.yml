@@ -1,10 +1,6 @@
-jwt:
-  secret: mySecretKey
-  expiration: 5000 # 5 seconds for testing
-
 spring:
   datasource:
-    url: jdbc:h2:mem:security_test
+    url: jdbc:h2:mem:order_test
     driver-class-name: org.h2.Driver
     username: sa
     password: password
@@ -27,7 +23,7 @@ eureka:
   client:
     enabled: false
 
-logging:
-  level:
-    "[com.ecommerce.security]": DEBUG
-    "[org.springframework.security]": DEBUG
+# Disable Kafka for tests
+ecommerce:
+  events:
+    bootstrap-servers: localhost:19092  # Non-existent port

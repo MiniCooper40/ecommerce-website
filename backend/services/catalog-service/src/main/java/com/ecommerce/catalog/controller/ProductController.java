@@ -26,7 +26,7 @@ import com.ecommerce.security.annotation.IsAdmin;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/catalog/products")
 @CrossOrigin(origins = "*")
 public class ProductController {
 

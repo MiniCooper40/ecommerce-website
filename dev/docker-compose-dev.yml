@@ -1,9 +1,8 @@
-version: "3.8"
+version: '3.8'
 
-# Default Development Configuration
-# This is the default compose file for development that includes only infrastructure services.
-# Use 'docker-compose-full.yml' if you want to run all services in containers.
-# Use 'docker-compose-dev.yml' explicitly for infrastructure-only mode.
+# Development Infrastructure Only
+# This compose file contains only the infrastructure services needed for local development.
+# Run your Spring Boot services natively using 'mvn spring-boot:run' or from your IDE.
 
 services:
   # MinIO S3 Compatible Storage
@@ -11,8 +10,8 @@ services:
     image: minio/minio:latest
     container_name: ecommerce-minio
     ports:
-      - "9000:9000" # S3 API
-      - "9001:9001" # MinIO Console
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # MinIO Console
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
@@ -50,10 +49,10 @@ services:
 
   # PostgreSQL Database
   postgres:
-    image: postgres:17-alpine
+    image: postgres:15-alpine
     container_name: ecommerce-postgres
     ports:
-      - "5434:5432"
+      - "5432:5432"
     environment:
       POSTGRES_DB: ecommerce
       POSTGRES_USER: postgres
@@ -125,11 +124,7 @@ services:
     volumes:
       - kafka_data:/var/lib/kafka/data
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "kafka-broker-api-versions --bootstrap-server localhost:9092",
-        ]
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092"]
       interval: 30s
       timeout: 10s
       retries: 5

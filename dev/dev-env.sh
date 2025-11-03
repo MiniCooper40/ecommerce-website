@@ -5,13 +5,38 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-COMPOSE_FILE="$SCRIPT_DIR/docker-compose.yml"
+
+# Parse arguments
+FULL_MODE=false
+COMMAND=""
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --full|-f)
+            FULL_MODE=true
+            shift
+            ;;
+        *)
+            COMMAND="$1"
+            shift
+            ;;
+    esac
+done
+
+# Determine which compose file to use
+if [[ "$FULL_MODE" == "true" ]] || [[ "$COMMAND" == "full" ]]; then
+    COMPOSE_FILE="$SCRIPT_DIR/docker-compose-full.yml"
+    MODE="FULL"
+else
+    COMPOSE_FILE="$SCRIPT_DIR/docker-compose.yml"
+    MODE="DEV"
+fi
 
 function show_help() {
-    echo "Usage: $0 [COMMAND]"
+    echo "Usage: $0 [COMMAND] [--full]"
     echo ""
     echo "Commands:"
-    echo "  start     Start the development environment"
+    echo "  start     Start the development environment (infrastructure only)"
     echo "  stop      Stop the development environment"
     echo "  restart   Restart the development environment"
     echo "  clean     Stop and remove all containers and volumes"
@@ -19,23 +44,58 @@ function show_help() {
     echo "  logs      Show logs for all services"
     echo "  minio     Open MinIO console in browser"
     echo "  test-s3   Test S3 functionality"
+    echo "  full      Start FULL environment (infrastructure + all services)"
     echo "  help      Show this help message"
+    echo ""
+    echo "Options:"
+    echo "  --full, -f    Use full compose file (all services in containers)"
+    echo ""
+    echo "Examples:"
+    echo "  $0 start          # Start infrastructure only (default)"
+    echo "  $0 start --full   # Start all services in containers"
+    echo "  $0 full           # Start all services in containers"
+    echo ""
+    echo "Development Modes:"
+    echo "  DEV Mode:  Infrastructure only - run Spring services natively"
+    echo "  FULL Mode: All services in containers"
 }
 
 function start_services() {
-    echo "🚀 Starting development environment..."
+    echo "🚀 Starting development environment ($MODE mode)..."
     docker-compose -f "$COMPOSE_FILE" up -d
     echo "✅ Development environment started!"
     echo ""
-    echo "📍 Service URLs:"
+    echo "📍 Infrastructure URLs:"
     echo "   MinIO Console: http://localhost:9001 (minioadmin/minioadmin)"
     echo "   MinIO S3 API:  http://localhost:9000"
     echo "   PostgreSQL:    localhost:5432 (postgres/password)"
     echo "   Redis:         localhost:6379"
+    echo "   Kafka:         localhost:9092"
+    echo "   Kafka UI:      http://localhost:8085"
+    
+    if [[ "$MODE" == "FULL" ]]; then
+        echo ""
+        echo "📍 Application URLs:"
+        echo "   API Gateway:   http://localhost:8080"
+        echo "   Eureka:        http://localhost:8761"
+        echo "   Security:      http://localhost:8081"
+        echo "   Catalog:       http://localhost:8082"
+        echo "   Order:         http://localhost:8083"
+        echo "   Cart:          http://localhost:8084"
+    else
+        echo ""
+        echo "💡 To run Spring services natively:"
+        echo "   cd backend/services/eureka-server && mvn spring-boot:run"
+        echo "   cd backend/services/security-service && mvn spring-boot:run"
+        echo "   cd backend/services/gateway && mvn spring-boot:run"
+        echo "   cd backend/services/catalog-service && mvn spring-boot:run"
+        echo "   cd backend/services/cart-service && mvn spring-boot:run"
+        echo "   cd backend/services/order-service && mvn spring-boot:run"
+    fi
 }
 
 function stop_services() {
-    echo "🛑 Stopping development environment..."
+    echo "🛑 Stopping development environment ($MODE mode)..."
     docker-compose -f "$COMPOSE_FILE" down
     echo "✅ Development environment stopped!"
 }
@@ -46,13 +106,13 @@ function restart_services() {
 }
 
 function clean_all() {
-    echo "🧹 Cleaning up development environment..."
+    echo "🧹 Cleaning up development environment ($MODE mode)..."
     docker-compose -f "$COMPOSE_FILE" down -v --remove-orphans
     echo "✅ Development environment cleaned!"
 }
 
 function show_status() {
-    echo "📊 Development environment status:"
+    echo "📊 Development environment status ($MODE mode):"
     docker-compose -f "$COMPOSE_FILE" ps
 }
 
@@ -100,7 +160,7 @@ function test_s3() {
     echo "3. Check MinIO console at http://localhost:9001 to see if bucket exists"
 }
 
-case "${1:-help}" in
+case "${COMMAND:-help}" in
     start)
         start_services
         ;;
@@ -125,11 +185,16 @@ case "${1:-help}" in
     test-s3)
         test_s3
         ;;
+    full)
+        COMPOSE_FILE="$SCRIPT_DIR/docker-compose-full.yml"
+        MODE="FULL"
+        start_services
+        ;;
     help|--help|-h)
         show_help
         ;;
     *)
-        echo "❌ Unknown command: $1"
+        echo "❌ Unknown command: $COMMAND"
         echo ""
         show_help
         exit 1

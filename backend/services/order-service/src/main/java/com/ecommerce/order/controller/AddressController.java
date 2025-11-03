@@ -22,7 +22,7 @@ import com.ecommerce.security.annotation.CurrentUserId;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/addresses")
+@RequestMapping("/addresses")
 @CrossOrigin(origins = "*")
 public class AddressController {
     

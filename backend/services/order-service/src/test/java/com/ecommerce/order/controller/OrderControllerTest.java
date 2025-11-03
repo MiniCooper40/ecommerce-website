@@ -21,17 +21,16 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.ecommerce.order.dto.AddressDto;
+import com.ecommerce.order.dto.CreateAddressRequest;
 import com.ecommerce.order.dto.CreateOrderItemRequest;
 import com.ecommerce.order.dto.CreateOrderRequest;
 import com.ecommerce.order.dto.OrderDto;
+import com.ecommerce.order.entity.AddressType;
 import com.ecommerce.order.entity.OrderStatus;
 import com.ecommerce.order.service.OrderService;
 import com.ecommerce.shared.testutil.WithMockUserPrincipal;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import com.ecommerce.order.dto.AddressDto;
-import com.ecommerce.order.dto.CreateAddressRequest;
-import com.ecommerce.order.entity.AddressType;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -54,7 +53,7 @@ public class OrderControllerTest {
         when(orderService.getUserOrders("test-user")).thenReturn(Arrays.asList(order));
 
         // Act & Assert
-        mockMvc.perform(get("/api/orders"))
+        mockMvc.perform(get("/orders"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].userId").value("test-user"))
@@ -69,7 +68,7 @@ public class OrderControllerTest {
         when(orderService.getOrder(1L, "test-user")).thenReturn(order);
 
         // Act & Assert
-        mockMvc.perform(get("/api/orders/1"))
+        mockMvc.perform(get("/orders/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.userId").value("test-user"))
@@ -85,7 +84,7 @@ public class OrderControllerTest {
         when(orderService.createOrder(any(CreateOrderRequest.class), anyString())).thenReturn(order);
 
         // Act & Assert
-        mockMvc.perform(post("/api/orders")
+        mockMvc.perform(post("/orders")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -102,7 +101,7 @@ public class OrderControllerTest {
         when(orderService.cancelOrder(1L, "test-user")).thenReturn(order);
 
         // Act & Assert
-        mockMvc.perform(put("/api/orders/1/cancel"))
+        mockMvc.perform(put("/orders/1/cancel"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.status").value("CANCELLED"));
@@ -116,7 +115,7 @@ public class OrderControllerTest {
         when(orderService.getAllOrders()).thenReturn(Arrays.asList(order));
 
         // Act & Assert
-        mockMvc.perform(get("/api/orders/admin/all"))
+        mockMvc.perform(get("/orders/admin/all"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].userId").value("test-user"));
@@ -126,14 +125,14 @@ public class OrderControllerTest {
     @WithMockUserPrincipal(userId = "regular-user", roles = {"USER"})
     public void testGetAllOrders_RegularUser_Forbidden() throws Exception {
         // Act & Assert
-        mockMvc.perform(get("/api/orders/admin/all"))
+        mockMvc.perform(get("/orders/admin/all"))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     public void testGetUserOrders_Unauthenticated() throws Exception {
         // Act & Assert
-        mockMvc.perform(get("/api/orders"))
+        mockMvc.perform(get("/orders"))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -143,7 +142,7 @@ public class OrderControllerTest {
         CreateOrderRequest request = createSampleOrderRequest();
 
         // Act & Assert
-        mockMvc.perform(post("/api/orders")
+        mockMvc.perform(post("/orders")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized());

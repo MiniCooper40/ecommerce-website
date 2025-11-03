@@ -6,23 +6,19 @@ spring:
     name: security-service
 
   datasource:
-    url: jdbc:h2:mem:security
-    driver-class-name: org.h2.Driver
-    username: sa
+    url: jdbc:postgresql://localhost:5434/security_db
+    driver-class-name: org.postgresql.Driver
+    username: postgres
     password: password
-
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 jwt:
   secret: mySecretKey
@@ -58,6 +54,12 @@ spring:
   config:
     activate:
       on-profile: docker
+
+  datasource:
+    url: jdbc:postgresql://postgres:5432/security_db
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: password
 
 eureka:
   client:

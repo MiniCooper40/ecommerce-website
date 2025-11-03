@@ -66,24 +66,24 @@ aws:
 
 **Endpoints:**
 
-1. **POST /api/images/upload-url**
+1. **POST /api/catalog/images/upload-url**
 
    - Parameters: `fileName`, `contentType`, `fileSize` (optional)
    - Returns: Presigned upload URL, object key, bucket name, expiration
    - Validates: Content type (images only), file size (10MB max)
 
-2. **POST /api/images/bulk-upload-urls**
+2. **POST /api/catalog/images/bulk-upload-urls**
 
    - Body: JSON with array of file requests
    - Returns: Array of presigned upload URLs
    - Validates: Max 20 files per request, content types, file sizes
    - Optimized for multiple file uploads
 
-3. **GET /api/images/download-url/{key}**
+3. **GET /api/catalog/images/download-url/{key}**
 
    - Returns: Presigned download URL for viewing/downloading
 
-4. **GET /api/images/public-url/{key}**
+4. **GET /api/catalog/images/public-url/{key}**
    - Returns: Public URL for accessing images (when bucket is public)
 
 ## Development Environment
@@ -122,14 +122,14 @@ The `dev/` directory contains:
 ### 1. Client Requests Upload URL (Single File)
 
 ```bash
-curl -X POST "http://localhost:8082/api/images/upload-url?fileName=product.jpg&contentType=image/jpeg"
+curl -X POST "http://localhost:8082/api/catalog/images/upload-url?fileName=product.jpg&contentType=image/jpeg"
 ```
 
 **Response:**
 
 ```json
 {
-  "uploadUrl": "http://localhost:9000/ecommerce-images/products/uuid/123456789.jpg?...",
+  "uploadUrl": "http://localhost:9000/ecommerce-images/catalog/images/uuid/123456789.jpg?...",
   "key": "products/uuid/123456789.jpg",
   "bucket": "ecommerce-images",
   "expiresInMinutes": 15
@@ -139,7 +139,7 @@ curl -X POST "http://localhost:8082/api/images/upload-url?fileName=product.jpg&c
 ### 1b. Client Requests Upload URLs (Bulk)
 
 ```bash
-curl -X POST "http://localhost:8082/api/images/bulk-upload-urls" \
+curl -X POST "http://localhost:8082/api/catalog/images/bulk-upload-urls" \
   -H "Content-Type: application/json" \
   -d '{
     "files": [
@@ -163,13 +163,13 @@ curl -X POST "http://localhost:8082/api/images/bulk-upload-urls" \
 {
   "uploadUrls": [
     {
-      "uploadUrl": "http://localhost:9000/ecommerce-images/products/uuid1/product1.jpg?...",
+      "uploadUrl": "http://localhost:9000/ecommerce-images/catalog/images/uuid1/product1.jpg?...",
       "key": "products/uuid1/product1.jpg",
       "bucket": "ecommerce-images",
       "expiresInMinutes": 15
     },
     {
-      "uploadUrl": "http://localhost:9000/ecommerce-images/products/uuid2/product2.png?...",
+      "uploadUrl": "http://localhost:9000/ecommerce-images/catalog/images/uuid2/product2.png?...",
       "key": "products/uuid2/product2.png",
       "bucket": "ecommerce-images",
       "expiresInMinutes": 15
@@ -194,10 +194,10 @@ The client can now save the product information including the S3 object key for 
 
 ```bash
 # Get public URL (if bucket is public)
-curl "http://localhost:8082/api/images/public-url/products/uuid/123456789.jpg"
+curl "http://localhost:8082/api/catalog/images/public-url/catalog/images/uuid/123456789.jpg"
 
 # Get presigned download URL (for private buckets)
-curl "http://localhost:8082/api/images/download-url/products/uuid/123456789.jpg"
+curl "http://localhost:8082/api/catalog/images/download-url/catalog/images/uuid/123456789.jpg"
 ```
 
 ## Security Considerations
@@ -270,7 +270,7 @@ curl "http://localhost:8082/api/images/download-url/products/uuid/123456789.jpg"
 
 ## Bulk Upload Benefits
 
-The bulk upload endpoint (`/api/images/bulk-upload-urls`) provides several advantages over multiple individual requests:
+The bulk upload endpoint (`/api/catalog/images/bulk-upload-urls`) provides several advantages over multiple individual requests:
 
 1. **Reduced HTTP Overhead**: One request instead of 5-10 individual requests
 2. **Better Performance**: Lower latency and network overhead
@@ -283,11 +283,11 @@ The bulk upload endpoint (`/api/images/bulk-upload-urls`) provides several advan
 ```javascript
 // Instead of multiple requests:
 // for (const file of files) {
-//   await fetch('/api/images/upload-url?...')
+//   await fetch('/api/catalog/images/upload-url?...')
 // }
 
 // Single bulk request:
-const response = await fetch("/api/images/bulk-upload-urls", {
+const response = await fetch("/api/catalog/images/bulk-upload-urls", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({

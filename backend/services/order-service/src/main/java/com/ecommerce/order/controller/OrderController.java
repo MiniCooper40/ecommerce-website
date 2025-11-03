@@ -21,7 +21,7 @@ import com.ecommerce.security.annotation.CurrentUserId;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/orders")
 @CrossOrigin(origins = "*")
 public class OrderController {
 

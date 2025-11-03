@@ -47,7 +47,7 @@ class ImageControllerTest extends BaseTest {
         Long fileSize = 1024000L;
         
         PresignedUploadUrlResponse mockResponse = new PresignedUploadUrlResponse(
-            "https://localhost:9000/ecommerce-images/products/uuid/test-product.jpg?signature=123",
+            "https://localhost:9000/ecommerce-images/catalog/products/uuid/test-product.jpg?signature=123",
             "products/uuid/test-product.jpg",
             "ecommerce-images",
             15L
@@ -57,7 +57,7 @@ class ImageControllerTest extends BaseTest {
             .thenReturn(mockResponse);
 
         // When & Then
-        mockMvc.perform(post("/api/images/upload-url")
+        mockMvc.perform(post("/catalog/images/upload-url")
                 .param("fileName", fileName)
                 .param("contentType", contentType)
                 .param("fileSize", fileSize.toString()))
@@ -76,7 +76,7 @@ class ImageControllerTest extends BaseTest {
         String contentType = "application/pdf";
 
         // When & Then
-        mockMvc.perform(post("/api/images/upload-url")
+        mockMvc.perform(post("/catalog/images/upload-url")
                 .param("fileName", fileName)
                 .param("contentType", contentType))
                 .andExpect(status().isBadRequest());
@@ -91,7 +91,7 @@ class ImageControllerTest extends BaseTest {
         Long fileSize = 11 * 1024 * 1024L; // 11MB, exceeds 10MB limit
 
         // When & Then
-        mockMvc.perform(post("/api/images/upload-url")
+        mockMvc.perform(post("/catalog/images/upload-url")
                 .param("fileName", fileName)
                 .param("contentType", contentType)
                 .param("fileSize", fileSize.toString()))
@@ -106,7 +106,7 @@ class ImageControllerTest extends BaseTest {
         String contentType = "image/jpeg";
 
         // When & Then - Empty fileName causes S3 service to throw exception, resulting in 500
-        mockMvc.perform(post("/api/images/upload-url")
+        mockMvc.perform(post("/catalog/images/upload-url")
                 .param("fileName", fileName)
                 .param("contentType", contentType))
                 .andExpect(status().isInternalServerError());
@@ -123,7 +123,7 @@ class ImageControllerTest extends BaseTest {
             .thenThrow(new RuntimeException("S3 service error"));
 
         // When & Then
-        mockMvc.perform(post("/api/images/upload-url")
+        mockMvc.perform(post("/catalog/images/upload-url")
                 .param("fileName", fileName)
                 .param("contentType", contentType))
                 .andExpect(status().isInternalServerError());
@@ -140,14 +140,14 @@ class ImageControllerTest extends BaseTest {
         BulkUploadRequest request = new BulkUploadRequest(files);
         
         PresignedUploadUrlResponse mockResponse1 = new PresignedUploadUrlResponse(
-            "https://localhost:9000/ecommerce-images/products/uuid1/product1.jpg?signature=123",
+            "https://localhost:9000/ecommerce-images/catalog/products/uuid1/product1.jpg?signature=123",
             "products/uuid1/product1.jpg",
             "ecommerce-images",
             15L
         );
         
         PresignedUploadUrlResponse mockResponse2 = new PresignedUploadUrlResponse(
-            "https://localhost:9000/ecommerce-images/products/uuid2/product2.png?signature=456",
+            "https://localhost:9000/ecommerce-images/catalog/products/uuid2/product2.png?signature=456",
             "products/uuid2/product2.png",
             "ecommerce-images",
             15L
@@ -159,7 +159,7 @@ class ImageControllerTest extends BaseTest {
             .thenReturn(mockResponse2);
 
         // When & Then
-        mockMvc.perform(post("/api/images/bulk-upload-urls")
+        mockMvc.perform(post("/catalog/images/bulk-upload-urls")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -182,7 +182,7 @@ class ImageControllerTest extends BaseTest {
         BulkUploadRequest request = new BulkUploadRequest(files);
 
         // When & Then
-        mockMvc.perform(post("/api/images/bulk-upload-urls")
+        mockMvc.perform(post("/catalog/images/bulk-upload-urls")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
@@ -199,7 +199,7 @@ class ImageControllerTest extends BaseTest {
         BulkUploadRequest request = new BulkUploadRequest(files);
 
         // When & Then
-        mockMvc.perform(post("/api/images/bulk-upload-urls")
+        mockMvc.perform(post("/catalog/images/bulk-upload-urls")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
@@ -219,7 +219,7 @@ class ImageControllerTest extends BaseTest {
         // This is expected behavior as the controller validates file size during stream processing
         org.junit.jupiter.api.Assertions.assertThrows(
             Exception.class, // Accept any exception (ServletException wrapping RuntimeException)
-            () -> mockMvc.perform(post("/api/images/bulk-upload-urls")
+            () -> mockMvc.perform(post("/catalog/images/bulk-upload-urls")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
         );
@@ -232,7 +232,7 @@ class ImageControllerTest extends BaseTest {
         BulkUploadRequest request = new BulkUploadRequest(Arrays.asList());
 
         // When & Then
-        mockMvc.perform(post("/api/images/bulk-upload-urls")
+        mockMvc.perform(post("/catalog/images/bulk-upload-urls")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
@@ -253,7 +253,7 @@ class ImageControllerTest extends BaseTest {
         when(s3Service.generatePresignedDownloadUrl(testKey))
             .thenReturn(mockDownloadUrl);
         
-        mockMvc.perform(get("/api/images/download-url/{key}", testKey))
+        mockMvc.perform(get("/catalog/images/download-url/{key}", testKey))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.downloadUrl").value(mockDownloadUrl))
                 .andExpect(jsonPath("$.key").value(testKey));
@@ -269,7 +269,7 @@ class ImageControllerTest extends BaseTest {
             .thenThrow(new RuntimeException("S3 service error"));
 
         // When & Then
-        mockMvc.perform(get("/api/images/download-url/{key}", testKey))
+        mockMvc.perform(get("/catalog/images/download-url/{key}", testKey))
                 .andExpect(status().isInternalServerError());
     }
 
@@ -283,7 +283,7 @@ class ImageControllerTest extends BaseTest {
         };
         
         PresignedUploadUrlResponse mockResponse = new PresignedUploadUrlResponse(
-            "https://localhost:9000/ecommerce-images/products/uuid/test-image?signature=123",
+            "https://localhost:9000/ecommerce-images/catalog/products/uuid/test-image?signature=123",
             "products/uuid/test-image",
             "ecommerce-images",
             15L
@@ -294,7 +294,7 @@ class ImageControllerTest extends BaseTest {
 
         // When & Then
         for (String contentType : validContentTypes) {
-            mockMvc.perform(post("/api/images/upload-url")
+            mockMvc.perform(post("/catalog/images/upload-url")
                     .param("fileName", fileName + "." + contentType.split("/")[1])
                     .param("contentType", contentType))
                     .andExpect(status().isOk())

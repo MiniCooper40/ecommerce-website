@@ -49,7 +49,7 @@ public class ProductControllerTest extends BaseTest {
         when(productService.getAllProducts(any(Pageable.class))).thenReturn(productPage);
 
         // Act & Assert
-        mockMvc.perform(get("/api/products"))
+        mockMvc.perform(get("/catalog/products"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value(1L))
                 .andExpect(jsonPath("$.content[0].name").value("Test Product"));
@@ -62,7 +62,7 @@ public class ProductControllerTest extends BaseTest {
         when(productService.getProduct(1L)).thenReturn(product);
 
         // Act & Assert
-        mockMvc.perform(get("/api/products/1"))
+        mockMvc.perform(get("/catalog/products/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.name").value("Test Product"));
@@ -76,7 +76,7 @@ public class ProductControllerTest extends BaseTest {
         when(productService.createProduct(any(ProductDto.class))).thenReturn(product);
 
         // Act & Assert
-        mockMvc.perform(post("/api/products")
+        mockMvc.perform(post("/catalog/products")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(product)))
                 .andExpect(status().isOk())
@@ -91,7 +91,7 @@ public class ProductControllerTest extends BaseTest {
         ProductDto product = createSampleProduct();
 
         // Act & Assert
-        mockMvc.perform(post("/api/products")
+        mockMvc.perform(post("/catalog/products")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(product)))
                 .andExpect(status().isForbidden());

@@ -24,7 +24,7 @@ import com.ecommerce.security.annotation.CurrentUserId;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/cart")
+@RequestMapping("/cart")
 @CrossOrigin(origins = "*")
 public class CartController {
 

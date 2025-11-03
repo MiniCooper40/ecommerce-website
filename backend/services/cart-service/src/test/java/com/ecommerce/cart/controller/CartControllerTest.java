@@ -33,7 +33,7 @@ public class CartControllerTest {
 
     @Test
     void shouldReturnUnauthorizedForNoAuth() throws Exception {
-        mockMvc.perform(get("/api/cart"))
+        mockMvc.perform(get("/cart"))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -46,7 +46,7 @@ public class CartControllerTest {
         
         when(cartService.getCart(anyString())).thenReturn(mockCart);
         
-        mockMvc.perform(get("/api/cart"))
+        mockMvc.perform(get("/cart"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalItems").value(0))
                 .andExpect(jsonPath("$.total").value(0));
@@ -69,7 +69,7 @@ public class CartControllerTest {
         
         when(cartService.getCart("test-user")).thenReturn(mockCart);
         
-        mockMvc.perform(get("/api/cart"))
+        mockMvc.perform(get("/cart"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalItems").value(2))
                 .andExpect(jsonPath("$.items[0].productName").value("Test Product"))
