@@ -17,10 +17,16 @@ import com.ecommerce.order.entity.OrderItem;
 import com.ecommerce.order.entity.OrderStatus;
 import com.ecommerce.order.mapper.OrderMapper;
 import com.ecommerce.order.repository.OrderRepository;
+import com.ecommerce.shared.events.EventPublisher;
+import com.ecommerce.shared.events.domain.CartValidationRequestedEvent;
+import com.ecommerce.shared.events.domain.ProductValidationRequestedEvent;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Service implementation class for order operations
  */
+@Slf4j
 @Service
 @Transactional
 public class OrderServiceImpl implements OrderService {
@@ -33,6 +39,9 @@ public class OrderServiceImpl implements OrderService {
     
     @Autowired
     private OrderMapper orderMapper;
+    
+    @Autowired
+    private EventPublisher eventPublisher;
     
     /**
      * Get all orders for a user
@@ -100,7 +109,68 @@ public class OrderServiceImpl implements OrderService {
         
         // Save the order
         Order savedOrder = orderRepository.save(order);
+        
+        // Publish validation request events
+        publishValidationRequests(savedOrder, request);
+        
         return orderMapper.toDto(savedOrder);
+    }
+    
+    /**
+     * Publish validation request events for cart and stock validation
+     */
+    private void publishValidationRequests(Order order, CreateOrderRequest request) {
+        try {
+            // Build cart items for validation
+            List<CartValidationRequestedEvent.CartItem> cartItems = request.getItems().stream()
+                    .map(item -> CartValidationRequestedEvent.CartItem.builder()
+                            .productId(item.getProductId().toString())
+                            .quantity(item.getQuantity())
+                            .build())
+                    .collect(Collectors.toList());
+            
+            // Publish cart validation request
+            CartValidationRequestedEvent cartValidationEvent = CartValidationRequestedEvent.builder()
+                    .cartId("cart-" + order.getUserId()) // In real app, would have actual cart ID
+                    .orderId(order.getId().toString())
+                    .userId(order.getUserId())
+                    .items(cartItems)
+                    .requestingService("order-service")
+                    .source("order-service")
+                    .correlationId(order.getId().toString())
+                    .build();
+            
+            eventPublisher.publish(cartValidationEvent);
+            log.info("Published CartValidationRequestedEvent for order: {}", order.getId());
+            
+            // Build product quantities for validation
+            List<ProductValidationRequestedEvent.ProductQuantity> productQuantities = 
+                    request.getItems().stream()
+                            .map(item -> ProductValidationRequestedEvent.ProductQuantity.builder()
+                                    .productId(item.getProductId().toString())
+                                    .requiredQuantity(item.getQuantity())
+                                    .build())
+                            .collect(Collectors.toList());
+            
+            // Publish product validation request
+            ProductValidationRequestedEvent productValidationEvent = ProductValidationRequestedEvent.builder()
+                    .requestId(order.getId().toString())
+                    .productIds(request.getItems().stream()
+                            .map(item -> item.getProductId().toString())
+                            .collect(Collectors.toList()))
+                    .requiredQuantities(productQuantities)
+                    .requestingService("order-service")
+                    .source("order-service")
+                    .correlationId(order.getId().toString())
+                    .build();
+            
+            eventPublisher.publish(productValidationEvent);
+            log.info("Published ProductValidationRequestedEvent for order: {}", order.getId());
+            
+        } catch (Exception e) {
+            log.error("Failed to publish validation request events for order: {}", order.getId(), e);
+            // Don't fail the order creation if event publishing fails
+        }
     }
     
     /**

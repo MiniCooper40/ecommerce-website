@@ -21,6 +21,9 @@ public class OrderDto {
     private String userId;
     private OrderStatus status;
     private BigDecimal totalAmount;
+    private Boolean cartValidated;
+    private Boolean stockValidated;
+    private LocalDateTime validationCompletedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private AddressDto shippingAddress;

@@ -123,4 +123,16 @@ public class CartEventListener {
             throw e;
         }
     }
+
+    /**
+     * Default handler for unknown event types on cart-events topic.
+     * This prevents errors when events like CartValidationCompletedEvent are published
+     * to the same topic but are meant for other services (e.g., order-service).
+     */
+    @KafkaHandler(isDefault = true)
+    public void handleUnknownEvent(Object event) {
+        log.debug("Received event on cart-events topic that is not handled by CartEventListener: {}", 
+                event.getClass().getSimpleName());
+        // Ignore - this is expected for validation events meant for order-service
+    }
 }

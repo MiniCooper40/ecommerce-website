@@ -1,7 +1,11 @@
 package com.ecommerce.e2e.util;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Builder for creating test product data.
@@ -70,6 +74,41 @@ public class TestDataBuilder {
         request.put("shippingAddress", shippingAddress);
         request.put("paymentMethod", paymentMethod);
         return request;
+    }
+
+    /**
+     * Create an order request.
+     */
+    public static Map<String, Object> createOrderRequest(List<Map<String, Object>> items) {
+        Map<String, Object> request = new HashMap<>();
+        request.put("shippingAddress", createAddress("SHIPPING", "123 Main St", "Test City", "TS", "12345", "Test Country"));
+        request.put("billingAddress", createAddress("BILLING", "123 Main St", "Test City", "TS", "12345", "Test Country"));
+        request.put("items", items);
+        return request;
+    }
+
+    /**
+     * Create an order item.
+     */
+    public static Map<String, Object> createOrderItem(Long productId, Integer quantity) {
+        Map<String, Object> item = new HashMap<>();
+        item.put("productId", productId);
+        item.put("quantity", quantity);
+        return item;
+    }
+
+    /**
+     * Create an address.
+     */
+    private static Map<String, Object> createAddress(String type, String street, String city, String state, String zipCode, String country) {
+        Map<String, Object> address = new HashMap<>();
+        address.put("type", type);
+        address.put("street", street);
+        address.put("city", city);
+        address.put("state", state);
+        address.put("zipCode", zipCode);
+        address.put("country", country);
+        return address;
     }
 
     /**

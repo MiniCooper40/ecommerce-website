@@ -51,6 +51,15 @@ public class Order {
     @Column(name = "total_amount", nullable = false, precision = 19, scale = 2)
     private BigDecimal totalAmount;
     
+    @Column(name = "cart_validated")
+    private Boolean cartValidated = false;
+    
+    @Column(name = "stock_validated")
+    private Boolean stockValidated = false;
+    
+    @Column(name = "validation_completed_at")
+    private LocalDateTime validationCompletedAt;
+    
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

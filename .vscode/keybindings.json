@@ -1,0 +1,11 @@
+[
+    {
+        "key": "ctrl+shift+b",
+        "command": "workbench.action.tasks.runTask",
+        "args": "Build Libs + Reload Workspace"
+    },
+    {
+        "key": "ctrl+alt+r",
+        "command": "java.clean.workspace"
+    }
+]

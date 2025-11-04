@@ -94,9 +94,12 @@ public class EventsAutoConfiguration {
             "CartItemUpdatedEvent:com.ecommerce.shared.events.domain.CartItemUpdatedEvent," +
             "CartItemRemovedEvent:com.ecommerce.shared.events.domain.CartItemRemovedEvent," +
             "ProductUpdatedEvent:com.ecommerce.shared.events.domain.ProductUpdatedEvent," +
+            "ProductDeletedEvent:com.ecommerce.shared.events.domain.ProductDeletedEvent," +
             "OrderCreatedEvent:com.ecommerce.shared.events.domain.OrderCreatedEvent," +
             "CartValidationRequestedEvent:com.ecommerce.shared.events.domain.CartValidationRequestedEvent," +
-            "CartValidationCompletedEvent:com.ecommerce.shared.events.domain.CartValidationCompletedEvent");
+            "CartValidationCompletedEvent:com.ecommerce.shared.events.domain.CartValidationCompletedEvent," +
+            "ProductValidationRequestedEvent:com.ecommerce.shared.events.domain.ProductValidationRequestedEvent," +
+            "ProductValidationCompletedEvent:com.ecommerce.shared.events.domain.ProductValidationCompletedEvent");
 
         return new DefaultKafkaConsumerFactory<>(configProps);
     }

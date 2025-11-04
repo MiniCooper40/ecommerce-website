@@ -41,6 +41,10 @@
       "path": "./backend/shared/events-lib"
     },
     {
+      "name": "E2E Tests",
+      "path": "./backend/e2e-tests"
+    },
+    {
       "name": "Root",
       "path": "."
     }

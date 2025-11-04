@@ -103,4 +103,17 @@ public class ProductEventListener {
             throw e;
         }
     }
+
+    /**
+     * Default handler for unknown event types on product-events topic.
+     * This prevents errors when events like ProductValidationRequestedEvent or 
+     * ProductValidationCompletedEvent are published to the same topic but are 
+     * meant for other services (e.g., catalog-service or order-service).
+     */
+    @KafkaHandler(isDefault = true)
+    public void handleUnknownEvent(Object event) {
+        log.debug("Received event on product-events topic that is not handled by ProductEventListener: {}", 
+                event.getClass().getSimpleName());
+        // Ignore - this is expected for validation events meant for other services
+    }
 }

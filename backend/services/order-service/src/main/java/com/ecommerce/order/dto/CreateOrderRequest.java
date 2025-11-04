@@ -8,7 +8,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.ecommerce.order.dto.CreateAddressRequest;
 
 /**
  * DTO for creating a new order
