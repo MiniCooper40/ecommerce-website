@@ -31,6 +31,7 @@
         <module>shared/test-utils</module>
         <module>shared/security-lib</module>
         <module>shared/events-lib</module>
+        <module>e2e-tests</module>
     </modules>
 
     <dependencyManagement>
@@ -97,4 +98,36 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <profiles>
+        <!-- Profile to build Docker images for all services -->
+        <profile>
+            <id>docker-build</id>
+            <modules>
+                <module>services/cart-service</module>
+                <module>services/catalog-service</module>
+                <module>services/eureka-server</module>
+                <module>services/gateway</module>
+                <module>services/order-service</module>
+                <module>services/security-service</module>
+            </modules>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
+                        <version>3.4.0</version>
+                        <executions>
+                            <execution>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>dockerBuild</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
