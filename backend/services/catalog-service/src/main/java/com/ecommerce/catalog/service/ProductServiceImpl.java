@@ -18,6 +18,7 @@ import com.ecommerce.catalog.dto.ProductDto;
 import com.ecommerce.catalog.entity.Product;
 import com.ecommerce.catalog.repository.ProductRepository;
 import com.ecommerce.shared.events.EventPublisher;
+import com.ecommerce.shared.events.domain.ProductDeletedEvent;
 import com.ecommerce.shared.events.domain.ProductUpdatedEvent;
 import com.ecommerce.shared.events.util.EventCorrelationUtils;
 
@@ -146,6 +147,9 @@ public class ProductServiceImpl implements ProductService {
         product.setIsActive(false);
         product.setUpdatedAt(LocalDateTime.now());
         productRepository.save(product);
+
+        // Publish ProductDeletedEvent to notify other services
+        publishProductDeletedEvent(product);
     }
 
     // Search products by name or description
@@ -345,6 +349,30 @@ public class ProductServiceImpl implements ProductService {
                     
         } catch (Exception e) {
             log.error("Failed to publish ProductUpdatedEvent for product ID: {}", product.getId(), e);
+            // Don't rethrow the exception to avoid breaking the main operation
+        }
+    }
+
+    /**
+     * Publishes a ProductDeletedEvent when a product is soft-deleted
+     */
+    private void publishProductDeletedEvent(Product product) {
+        try {
+            ProductDeletedEvent event = ProductDeletedEvent.builder()
+                    .productId(product.getId().toString())
+                    .name(product.getName())
+                    .category(product.getCategory())
+                    .source("catalog-service")
+                    .correlationId(EventCorrelationUtils.getOrCreateCorrelationId())
+                    .build();
+
+            eventPublisher.publish(event);
+            
+            log.info("Published ProductDeletedEvent for product ID: {} with correlation ID: {}", 
+                    product.getId(), event.getCorrelationId());
+                    
+        } catch (Exception e) {
+            log.error("Failed to publish ProductDeletedEvent for product ID: {}", product.getId(), e);
             // Don't rethrow the exception to avoid breaking the main operation
         }
     }

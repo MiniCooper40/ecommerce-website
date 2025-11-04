@@ -58,6 +58,7 @@ public class CartQueryService {
                 .productPrice(view.getProductPrice())
                 .productImageUrl(view.getProductImageUrl())
                 .quantity(view.getQuantity())
+                .available(view.getAvailable())
                 .createdAt(view.getCreatedAt())
                 .updatedAt(view.getUpdatedAt())
                 .build();

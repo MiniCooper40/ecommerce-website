@@ -71,6 +71,10 @@ public class CartItemView {
     @Column(name = "product_active")
     private Boolean productActive;
 
+    @Column(name = "available", nullable = false)
+    @Builder.Default
+    private Boolean available = true;
+
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 

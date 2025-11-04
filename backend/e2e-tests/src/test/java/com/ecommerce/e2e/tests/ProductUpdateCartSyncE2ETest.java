@@ -157,7 +157,8 @@ class ProductUpdateCartSyncE2ETest extends E2ETestBase {
                             .body("items[0].productId", equalTo(productId.intValue()))
                             .body("items[0].productName", equalTo(ORIGINAL_NAME))
                             .body("items[0].productPrice", equalTo(ORIGINAL_PRICE.floatValue()))
-                            .body("items[0].quantity", equalTo(3));
+                            .body("items[0].quantity", equalTo(3))
+                            .body("items[0].available", equalTo(true));
                 });
 
         log.info("Cart verified with original product name: '{}' and price: {}", ORIGINAL_NAME, ORIGINAL_PRICE);
@@ -232,6 +233,7 @@ class ProductUpdateCartSyncE2ETest extends E2ETestBase {
                             .body("items[0].productName", equalTo(UPDATED_NAME))
                             .body("items[0].productPrice", equalTo(UPDATED_PRICE.floatValue()))
                             .body("items[0].quantity", equalTo(3))
+                            .body("items[0].available", equalTo(true))
                             .body("totalItems", equalTo(3))
                             .body("subtotal", notNullValue());
                 });
@@ -244,31 +246,61 @@ class ProductUpdateCartSyncE2ETest extends E2ETestBase {
 
     @Test
     @Order(6)
-    @DisplayName("Verify cart subtotal reflects updated price")
-    void testVerifyCartSubtotal() {
-        log.info("TEST 6: Verifying cart subtotal calculation with updated price");
+    @DisplayName("Admin deletes product and cart item is marked unavailable")
+    void testProductDeletionMarksCartItemUnavailable() {
+        log.info("TEST 6: Deleting product and verifying cart item is marked as unavailable");
         
-        // Expected subtotal = quantity (3) × updated price (149.99)
-        BigDecimal expectedSubtotal = UPDATED_PRICE.multiply(new BigDecimal("3"));
-        
+        // Delete the product
         given()
                 .baseUri(GATEWAY_URL)
-                .header("Authorization", "Bearer " + userToken)
+                .header("Authorization", "Bearer " + adminToken)
             .when()
-                .get("/api/cart")
+                .delete("/api/catalog/products/" + productId)
             .then()
-                .statusCode(200)
-                .body("items[0].productPrice", equalTo(UPDATED_PRICE.floatValue()))
-                .body("subtotal", equalTo(expectedSubtotal.floatValue()));
+                .statusCode(204);
 
-        log.info("Cart subtotal correctly calculated: {} (3 × {})", expectedSubtotal, UPDATED_PRICE);
+        log.info("Product deleted successfully");
+
+        // Wait for ProductDeletedEvent to be processed by cart service
+        // This tests the event-driven architecture:
+        // 1. Catalog service publishes ProductDeletedEvent
+        // 2. Cart service ProductEventListener receives event
+        // 3. CartItemViewRepository marks cart items as unavailable
+        await()
+                .atMost(15, SECONDS)
+                .pollInterval(1, SECONDS)
+                .untilAsserted(() -> {
+                    Response cartResponse = given()
+                            .baseUri(GATEWAY_URL)
+                            .header("Authorization", "Bearer " + userToken)
+                        .when()
+                            .get("/api/cart")
+                        .then()
+                            .statusCode(200)
+                            .extract()
+                            .response();
+                    
+                    log.info("Cart response after deletion: {}", cartResponse.getBody().asString());
+                    
+                    cartResponse.then()
+                            .body("items", hasSize(1))
+                            .body("items[0].productId", equalTo(productId.intValue()))
+                            .body("items[0].productName", equalTo(UPDATED_NAME))
+                            .body("items[0].available", equalTo(false))  // Product is now unavailable
+                            .body("items[0].quantity", equalTo(3));
+                });
+
+        log.info("✅ Cart item successfully marked as unavailable after product deletion!");
+        log.info("   Product still in cart but available=false");
+        log.info("   User can see unavailable items and must manually remove them");
+        log.info("   Event-driven product deletion handling working correctly!");
     }
 
     @Test
     @Order(7)
-    @DisplayName("User removes product from cart")
-    void testCleanupCart() {
-        log.info("TEST 7: Cleaning up - removing product from cart");
+    @DisplayName("User removes unavailable product from cart")
+    void testCleanupUnavailableProduct() {
+        log.info("TEST 7: User manually removes unavailable product from cart");
 
         given()
                 .baseUri(GATEWAY_URL)
@@ -278,7 +310,8 @@ class ProductUpdateCartSyncE2ETest extends E2ETestBase {
             .then()
                 .statusCode(204);
 
-        log.info("Product removed from cart successfully");
+        log.info("Unavailable product removed from cart successfully");
+        log.info("This demonstrates users have control over removing unavailable items");
     }
 
     @AfterAll

@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ecommerce.cart.dto.ProductDto;
 import com.ecommerce.cart.repository.CartItemViewRepository;
 import com.ecommerce.cart.service.ProductCacheService;
+import com.ecommerce.shared.events.domain.ProductDeletedEvent;
 import com.ecommerce.shared.events.domain.ProductUpdatedEvent;
 
 import lombok.extern.slf4j.Slf4j;
@@ -69,6 +70,36 @@ public class ProductEventListener {
 
         } catch (Exception e) {
             log.error("Error handling ProductUpdatedEvent: {}", event.getAggregateId(), e);
+            throw e;
+        }
+    }
+
+    /**
+     * Handle ProductDeletedEvent - mark cart items as unavailable.
+     * This approach allows users to see unavailable items in their cart and manually remove them.
+     * This is better UX than silently removing items, as users need to be aware that products
+     * they added are no longer available.
+     */
+    @KafkaHandler
+    @Transactional
+    public void handleProductDeleted(ProductDeletedEvent event) {
+        log.info("Handling ProductDeletedEvent for productId: {}", event.getAggregateId());
+
+        try {
+            Long productId = Long.parseLong(event.getAggregateId());
+
+            // Mark all cart items with this product as unavailable
+            // Users will see these items marked as unavailable in their cart
+            // and will need to manually remove them
+            cartItemViewRepository.markProductAsUnavailable(productId);
+
+            // Remove product from cache
+            productCacheService.invalidateProductCache(productId);
+
+            log.info("Marked all CartItemViews as unavailable for deleted productId: {}", productId);
+
+        } catch (Exception e) {
+            log.error("Error handling ProductDeletedEvent: {}", event.getAggregateId(), e);
             throw e;
         }
     }

@@ -42,4 +42,12 @@ public interface CartItemViewRepository extends JpaRepository<CartItemView, Long
                                        @Param("imageUrl") String imageUrl,
                                        @Param("category") String category,
                                        @Param("active") Boolean active);
+
+    @Modifying
+    @Query("UPDATE CartItemView v SET v.available = false WHERE v.productId = :productId")
+    void markProductAsUnavailable(@Param("productId") Long productId);
+
+    @Modifying
+    @Query("DELETE FROM CartItemView v WHERE v.productId = :productId AND v.available = false")
+    void deleteUnavailableProductItems(@Param("productId") Long productId);
 }

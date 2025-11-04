@@ -33,6 +33,9 @@ public class CartItemDto {
     @NotNull(message = "Quantity is required")
     private Integer quantity;
     
+    @Builder.Default
+    private Boolean available = true;
+    
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

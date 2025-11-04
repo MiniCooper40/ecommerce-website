@@ -138,6 +138,7 @@ class CartFlowE2ETest extends E2ETestBase {
                             .body("items", hasSize(greaterThan(0)))
                             .body("items[0].productId", equalTo(productId.intValue()))
                             .body("items[0].quantity", equalTo(2))
+                            .body("items[0].available", equalTo(true))
                             .body("totalItems", equalTo(2))  // totalItems = sum of all quantities
                             .body("subtotal", notNullValue());
                 });
@@ -181,6 +182,7 @@ class CartFlowE2ETest extends E2ETestBase {
                         .then()
                             .statusCode(200)
                             .body("items[0].quantity", equalTo(5))
+                            .body("items[0].available", equalTo(true))
                             .body("totalItems", equalTo(5));  // totalItems = sum of all quantities
                 });
 
