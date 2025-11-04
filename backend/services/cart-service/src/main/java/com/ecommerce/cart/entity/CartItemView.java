@@ -1,7 +1,7 @@
 package com.ecommerce.cart.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -15,37 +15,37 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Write model - Minimal cart item entity for CQRS pattern.
- * Contains only essential data for command operations.
+ * Read model - Denormalized cart item view for CQRS pattern.
+ * Contains cart item data joined with product details for efficient querying.
  */
 @Entity
-@Table(name = "cart_items", indexes = {
-    @Index(name = "idx_cart_items_user_id", columnList = "user_id"),
-    @Index(name = "idx_cart_items_cart_id", columnList = "cart_id"),
-    @Index(name = "idx_cart_items_user_product", columnList = "user_id, product_id")
+@Table(name = "cart_item_view", indexes = {
+    @Index(name = "idx_cart_view_user_id", columnList = "user_id"),
+    @Index(name = "idx_cart_view_cart_id", columnList = "cart_id"),
+    @Index(name = "idx_cart_view_product_id", columnList = "product_id")
 })
 @EntityListeners(AuditingEntityListener.class)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CartItem {
+public class CartItemView {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "cart_item_id", nullable = false, unique = true)
+    private Long cartItemId;
+
     @Column(name = "cart_id", nullable = false)
-    @Builder.Default
-    private String cartId = UUID.randomUUID().toString();
+    private String cartId;
 
     @Column(name = "user_id", nullable = false)
     private String userId;
@@ -53,8 +53,24 @@ public class CartItem {
     @Column(name = "product_id", nullable = false)
     private Long productId;
 
-    @Min(1)
-    @NotNull
+    @Column(name = "product_name")
+    private String productName;
+
+    @Column(name = "product_description")
+    private String productDescription;
+
+    @Column(name = "product_price", precision = 10, scale = 2)
+    private BigDecimal productPrice;
+
+    @Column(name = "product_image_url")
+    private String productImageUrl;
+
+    @Column(name = "product_category")
+    private String productCategory;
+
+    @Column(name = "product_active")
+    private Boolean productActive;
+
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
@@ -65,4 +81,12 @@ public class CartItem {
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    // Utility methods
+    public BigDecimal getSubtotal() {
+        if (productPrice != null && quantity != null) {
+            return productPrice.multiply(BigDecimal.valueOf(quantity));
+        }
+        return BigDecimal.ZERO;
+    }
 }

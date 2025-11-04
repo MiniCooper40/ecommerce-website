@@ -1,10 +1,8 @@
 package com.ecommerce.shared.events.config;
 
-import com.ecommerce.shared.events.EventPublisher;
-import com.ecommerce.shared.events.impl.KafkaEventPublisher;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import lombok.RequiredArgsConstructor;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -13,13 +11,21 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
-import org.springframework.kafka.core.*;
+import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.core.DefaultKafkaProducerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.ecommerce.shared.events.EventPublisher;
+import com.ecommerce.shared.events.impl.KafkaEventPublisher;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * Auto-configuration for Kafka events.
@@ -55,7 +61,7 @@ public class EventsAutoConfiguration {
         configProps.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, eventsProperties.getProducer().isEnableIdempotence());
 
         // Configure JSON serializer
-        configProps.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, false);
+        configProps.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, true);
 
         return new DefaultKafkaProducerFactory<>(configProps);
     }
@@ -82,8 +88,15 @@ public class EventsAutoConfiguration {
 
         // Configure JSON deserializer
         configProps.put(JsonDeserializer.TRUSTED_PACKAGES, "com.ecommerce.*");
-        configProps.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, false);
-        configProps.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "com.ecommerce.shared.events.BaseEvent");
+        configProps.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, true);
+        configProps.put(JsonDeserializer.TYPE_MAPPINGS, 
+            "CartItemAddedEvent:com.ecommerce.shared.events.domain.CartItemAddedEvent," +
+            "CartItemUpdatedEvent:com.ecommerce.shared.events.domain.CartItemUpdatedEvent," +
+            "CartItemRemovedEvent:com.ecommerce.shared.events.domain.CartItemRemovedEvent," +
+            "ProductUpdatedEvent:com.ecommerce.shared.events.domain.ProductUpdatedEvent," +
+            "OrderCreatedEvent:com.ecommerce.shared.events.domain.OrderCreatedEvent," +
+            "CartValidationRequestedEvent:com.ecommerce.shared.events.domain.CartValidationRequestedEvent," +
+            "CartValidationCompletedEvent:com.ecommerce.shared.events.domain.CartValidationCompletedEvent");
 
         return new DefaultKafkaConsumerFactory<>(configProps);
     }

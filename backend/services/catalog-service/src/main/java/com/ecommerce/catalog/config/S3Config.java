@@ -50,15 +50,21 @@ public class S3Config {
 
     @Bean
     public S3Presigner s3Presigner() {
-        var builder = S3Presigner.builder()
+        S3Presigner.Builder builder = S3Presigner.builder()
                 .region(Region.of(region))
                 .credentialsProvider(StaticCredentialsProvider.create(
                         AwsBasicCredentials.create(accessKey, secretKey)
                 ));
 
-        // For mock S3 (MinIO)
+        // For mock S3 (MinIO) - must use path-style access
         if (!s3Endpoint.isEmpty()) {
-            builder.endpointOverride(URI.create(s3Endpoint));
+            // Create S3Configuration for path-style access
+            S3Configuration s3Config = S3Configuration.builder()
+                    .pathStyleAccessEnabled(true)
+                    .build();
+            
+            builder.endpointOverride(URI.create(s3Endpoint))
+                   .serviceConfiguration(s3Config);
         }
 
         return builder.build();

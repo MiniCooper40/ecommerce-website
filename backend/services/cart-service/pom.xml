@@ -54,6 +54,12 @@
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
         
+        <!-- Spring Cloud OpenFeign for inter-service communication -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+        
         <!-- Spring Kafka for event messaging -->
         <dependency>
             <groupId>org.springframework.kafka</groupId>

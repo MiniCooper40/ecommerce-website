@@ -29,6 +29,8 @@ services:
     depends_on:
       minio:
         condition: service_healthy
+    volumes:
+      - ./minio-seed-data/products:/seed-data/products:ro
     entrypoint: >
       /bin/sh -c "
       echo 'Waiting for MinIO to be ready...';
@@ -38,6 +40,14 @@ services:
       mc mb myminio/ecommerce-images --ignore-existing;
       echo 'Setting bucket policy to public...';
       mc anonymous set public myminio/ecommerce-images;
+      echo 'Uploading seed data (product images)...';
+      if [ -d /seed-data/products ] && [ \"\$(ls -A /seed-data/products 2>/dev/null)\" ]; then
+        mc cp --recursive /seed-data/products/ myminio/ecommerce-images/products/;
+        echo 'Uploaded product images to MinIO';
+      else
+        echo 'No seed data found - skipping image upload';
+        echo 'Run ./minio-seed-data/generate-placeholders.ps1 to create placeholder images';
+      fi;
       echo 'MinIO setup complete!';
       "
     networks:

@@ -37,8 +37,8 @@ public class ImageService {
             throw new IllegalArgumentException("Image with S3 key already exists: " + request.getS3Key());
         }
         
-        // Generate download URL from S3 key
-        String downloadUrl = s3Service.generatePresignedDownloadUrl(request.getS3Key());
+        // Use public URL for MinIO (bucket is public), or presigned URL for private buckets
+        String downloadUrl = s3Service.getPublicUrl(request.getS3Key());
         
         // Extract metadata from S3 key
         String bucket = extractBucketFromKey(request.getS3Key());
