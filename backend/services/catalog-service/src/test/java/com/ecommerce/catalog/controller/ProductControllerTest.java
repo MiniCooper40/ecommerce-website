@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.ecommerce.catalog.dto.CreateProductRequest;
 import com.ecommerce.catalog.dto.ProductDto;
 import com.ecommerce.catalog.service.ProductService;
 import com.ecommerce.shared.testutil.BaseTest;
@@ -72,13 +73,14 @@ public class ProductControllerTest extends BaseTest {
     @WithMockUserPrincipal(userId = "admin-user", roles = {"ADMIN"})
     public void testCreateProduct_AdminUser() throws Exception {
         // Arrange
+        CreateProductRequest createRequest = createSampleCreateProductRequest();
         ProductDto product = createSampleProduct();
-        when(productService.createProduct(any(ProductDto.class))).thenReturn(product);
+        when(productService.createProduct(any(CreateProductRequest.class))).thenReturn(product);
 
         // Act & Assert
         mockMvc.perform(post("/catalog/products")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(product)))
+                .content(objectMapper.writeValueAsString(createRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.name").value("Test Product"));
@@ -88,13 +90,25 @@ public class ProductControllerTest extends BaseTest {
     @WithMockUserPrincipal(userId = "regular-user", roles = {"USER"})
     public void testCreateProduct_RegularUser_Forbidden() throws Exception {
         // Arrange
-        ProductDto product = createSampleProduct();
+        CreateProductRequest createRequest = createSampleCreateProductRequest();
 
         // Act & Assert
         mockMvc.perform(post("/catalog/products")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(product)))
+                .content(objectMapper.writeValueAsString(createRequest)))
                 .andExpect(status().isForbidden());
+    }
+
+    private CreateProductRequest createSampleCreateProductRequest() {
+        CreateProductRequest request = new CreateProductRequest();
+        request.setName("Test Product");
+        request.setDescription("Test Description");
+        request.setPrice(new BigDecimal("29.99"));
+        request.setCategory("Electronics");
+        request.setBrand("TestBrand");
+        request.setStockQuantity(5);
+        // No images for this basic test
+        return request;
     }
 
     private ProductDto createSampleProduct() {

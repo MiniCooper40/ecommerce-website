@@ -71,23 +71,7 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
-    // Create new product (Admin only)
-    @Override
-    public ProductDto createProduct(ProductDto productDto) {
-        // Check if SKU already exists
-        if (productDto.getSku() != null && productRepository.existsBySku(productDto.getSku())) {
-            throw new RuntimeException("Product with SKU '" + productDto.getSku() + "' already exists");
-        }
-
-        Product product = convertToEntity(productDto);
-        product.setCreatedAt(LocalDateTime.now());
-        product.setUpdatedAt(LocalDateTime.now());
-        
-        product = productRepository.save(product);
-        return convertToDto(product);
-    }
-
-    // Create new product with images (Admin only)
+    // Create new product with optional images (Admin only)
     @Override
     public ProductDto createProduct(CreateProductRequest createRequest) {
         // Check if SKU already exists
@@ -269,22 +253,6 @@ public class ProductServiceImpl implements ProductService {
         dto.setCreatedAt(product.getCreatedAt());
         dto.setUpdatedAt(product.getUpdatedAt());
         return dto;
-    }
-
-    // Convert DTO to Entity
-    private Product convertToEntity(ProductDto dto) {
-        Product product = new Product();
-        product.setName(dto.getName());
-        product.setDescription(dto.getDescription());
-        product.setPrice(dto.getPrice());
-        product.setCategory(dto.getCategory());
-        product.setBrand(dto.getBrand());
-        product.setStockQuantity(dto.getStockQuantity() != null ? dto.getStockQuantity() : 0);
-        product.setSku(dto.getSku());
-        product.setWeight(dto.getWeight());
-        product.setDimensions(dto.getDimensions());
-        product.setIsActive(dto.getIsActive() != null ? dto.getIsActive() : true);
-        return product;
     }
 
     // Convert CreateProductRequest to Entity

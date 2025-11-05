@@ -30,12 +30,7 @@ public interface ProductService {
     List<ProductDto> getProductsByCategory(String category);
 
     /**
-     * Create new product (Admin only)
-     */
-    ProductDto createProduct(ProductDto productDto);
-
-    /**
-     * Create new product with images (Admin only)
+     * Create new product with optional images (Admin only)
      */
     ProductDto createProduct(CreateProductRequest createRequest);
 

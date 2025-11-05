@@ -53,15 +53,8 @@ public class ProductController {
 
     @PostMapping
     @IsAdmin
-    public ResponseEntity<ProductDto> createProduct(@Valid @RequestBody ProductDto productDto) {
+    public ResponseEntity<ProductDto> createProduct(@Valid @RequestBody CreateProductRequest createRequest) {
         // Only admins can create products
-        return ResponseEntity.ok(productService.createProduct(productDto));
-    }
-
-    @PostMapping("/with-images")
-    @IsAdmin
-    public ResponseEntity<ProductDto> createProductWithImages(@Valid @RequestBody CreateProductRequest createRequest) {
-        // Only admins can create products with images
         return ResponseEntity.ok(productService.createProduct(createRequest));
     }
 
