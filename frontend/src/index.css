@@ -6,6 +6,97 @@
   html {
     font-family: "Inter", ui-sans-serif, system-ui;
   }
+  :root {
+    /* Light mode - E-commerce Blue theme */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    /* Primary: Blue for e-commerce (trust, professionalism) */
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+
+    /* Secondary: Slate/Gray */
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    /* Muted: Subtle backgrounds */
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    /* Accent: Complementary orange for CTAs */
+    --accent: 24.6 95% 53.1%;
+    --accent-foreground: 26 83.3% 14.1%;
+
+    /* Destructive: Red for errors/deletions */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Borders and inputs */
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+
+    /* Success: Green for confirmations */
+    --success: 142.1 76.2% 36.3%;
+    --success-foreground: 355.7 100% 97.3%;
+
+    /* Warning: Amber */
+    --warning: 38 92% 50%;
+    --warning-foreground: 26 83.3% 14.1%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Dark mode - E-commerce theme */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Primary: Lighter blue for dark mode */
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    /* Secondary: Dark slate */
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    /* Muted */
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    /* Accent: Orange for CTAs */
+    --accent: 24.6 95% 53.1%;
+    --accent-foreground: 26 83.3% 14.1%;
+
+    /* Destructive */
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Borders and inputs */
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+
+    /* Success */
+    --success: 142.1 70.6% 45.3%;
+    --success-foreground: 355.7 100% 97.3%;
+
+    /* Warning */
+    --warning: 38 92% 50%;
+    --warning-foreground: 26 83.3% 14.1%;
+  }
 }
 
 @layer components {
@@ -19,5 +110,14 @@
 
   .btn-secondary {
     @apply btn bg-gray-200 text-gray-900 hover:bg-gray-300;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }

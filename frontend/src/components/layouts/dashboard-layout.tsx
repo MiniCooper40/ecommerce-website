@@ -1,12 +1,12 @@
 import { ReactNode } from "react";
-import Footer from "./Footer";
-import Header from "./Header";
+import { Footer } from "./footer";
+import { Header } from "./header";
 
-interface LayoutProps {
+interface DashboardLayoutProps {
   children: ReactNode;
 }
 
-const Layout = ({ children }: LayoutProps) => {
+export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -15,5 +15,3 @@ const Layout = ({ children }: LayoutProps) => {
     </div>
   );
 };
-
-export default Layout;
