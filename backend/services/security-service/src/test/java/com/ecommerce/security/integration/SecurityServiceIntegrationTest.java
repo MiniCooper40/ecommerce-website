@@ -303,4 +303,111 @@ public class SecurityServiceIntegrationTest {
         // Verify tokens are different
         assert !token.equals(newToken) : "Refreshed token should be different from original";
     }
+
+    @Test
+    @Order(7)
+    @DisplayName("/me endpoint with Bearer token authentication")
+    void testMeEndpointWithBearerToken() {
+        // Register a user and get token
+        String email = "me.bearer@example.com";
+        String token = given()
+            .contentType(ContentType.JSON)
+            .body(String.format("""
+                {
+                    "email": "%s",
+                    "password": "password123",
+                    "firstName": "Bearer",
+                    "lastName": "User"
+                }
+                """, email))
+        .when()
+            .post("/auth/register")
+        .then()
+            .statusCode(200)
+            .extract()
+            .path("token");
+
+        // Call /me endpoint with Bearer token
+        given()
+            .header("Authorization", "Bearer " + token)
+        .when()
+            .get("/auth/me")
+        .then()
+            .statusCode(200)
+            .body("email", equalTo(email))
+            .body("firstName", equalTo("Bearer"))
+            .body("lastName", equalTo("User"))
+            .body("roles", hasItem("USER"))
+            .body("roles", hasItem("CUSTOMER"))
+            .body("id", notNullValue())
+            .body("createdAt", notNullValue());
+    }
+
+    @Test
+    @Order(8)
+    @DisplayName("/me endpoint with cookie authentication")
+    void testMeEndpointWithCookie() {
+        // Register a user and extract cookie
+        String email = "me.cookie@example.com";
+        
+        io.restassured.response.Response response = given()
+            .contentType(ContentType.JSON)
+            .body(String.format("""
+                {
+                    "email": "%s",
+                    "password": "password123",
+                    "firstName": "Cookie",
+                    "lastName": "User"
+                }
+                """, email))
+        .when()
+            .post("/auth/register")
+        .then()
+            .statusCode(200)
+            .header("Set-Cookie", notNullValue())
+            .extract()
+            .response();
+
+        // Extract cookie from response
+        String setCookieHeader = response.getHeader("Set-Cookie");
+        
+        // Call /me endpoint with cookie
+        given()
+            .header("Cookie", setCookieHeader.split(";")[0]) // Get just jwt_token=...
+        .when()
+            .get("/auth/me")
+        .then()
+            .statusCode(200)
+            .body("email", equalTo(email))
+            .body("firstName", equalTo("Cookie"))
+            .body("lastName", equalTo("User"))
+            .body("roles", hasItem("USER"))
+            .body("roles", hasItem("CUSTOMER"))
+            .body("id", notNullValue())
+            .body("createdAt", notNullValue());
+    }
+
+    @Test
+    @Order(9)
+    @DisplayName("/me endpoint without authentication returns 401")
+    void testMeEndpointWithoutAuth() {
+        given()
+        .when()
+            .get("/auth/me")
+        .then()
+            .statusCode(401);
+    }
+
+    @Test
+    @Order(10)
+    @DisplayName("/me endpoint with invalid token returns 401")
+    void testMeEndpointWithInvalidToken() {
+        // Test with invalid Bearer token
+        given()
+            .header("Authorization", "Bearer invalid.token.here")
+        .when()
+            .get("/auth/me")
+        .then()
+            .statusCode(401);
+    }
 }

@@ -1,5 +1,6 @@
 package com.ecommerce.cart.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -11,6 +12,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
+import com.ecommerce.security.config.CookieBearerTokenResolver;
+
 /**
  * JWT Security Configuration for Cart Service.
  * 
@@ -19,11 +22,15 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
  * - Uses Spring Security's default JWT converter (handles SCOPE_ prefixed authorities)
  * - Provides stateless authentication
  * - Protects cart endpoints requiring user authentication
+ * - Accepts JWT from cookies or Authorization header
  */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 public class JwtSecurityConfig {
+
+    @Autowired
+    private CookieBearerTokenResolver cookieBearerTokenResolver;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
@@ -47,6 +54,7 @@ public class JwtSecurityConfig {
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2
+                .bearerTokenResolver(cookieBearerTokenResolver)
                 .jwt(Customizer.withDefaults())
             );
 

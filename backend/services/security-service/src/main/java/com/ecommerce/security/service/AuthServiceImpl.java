@@ -123,6 +123,14 @@ public class AuthServiceImpl implements AuthService {
         return new AuthResponse(newToken, jwtUtil.getExpirationTime(), convertToUserDto(user));
     }
 
+    @Override
+    public AuthResponse.UserDto getCurrentUser(Long userId) {
+        User user = userRepository.findByIdWithRoles(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        
+        return convertToUserDto(user);
+    }
+
     private AuthResponse.UserDto convertToUserDto(User user) {
         List<String> roleNames = user.getRoles().stream()
                 .map(role -> role.getName().name())

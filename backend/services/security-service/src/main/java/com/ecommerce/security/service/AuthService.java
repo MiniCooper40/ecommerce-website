@@ -23,4 +23,9 @@ public interface AuthService {
      * Refresh a JWT token
      */
     AuthResponse refresh(String authHeader);
+    
+    /**
+     * Get current user information by user ID
+     */
+    AuthResponse.UserDto getCurrentUser(Long userId);
 }
